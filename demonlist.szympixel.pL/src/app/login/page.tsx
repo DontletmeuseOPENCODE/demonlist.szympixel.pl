@@ -36,7 +36,7 @@ export default function LoginPage() {
     <main className="login-page">
       <div className="login-card">
         <div className="login-logo">
-          <img src="/logo.svg" alt="Demonlist logo" width={64} height={64} />
+          <img src="/logo.png" alt="Demonlist logo" width={64} height={64} />
         </div>
         <h1 className="login-title">Demonlist Admin</h1>
         <p className="login-subtitle">szympixel.pl</p>

@@ -27,7 +27,7 @@ export default function Navbar({ user }: NavbarProps) {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link href="/" className="navbar-brand">
-          <img src="/logo.svg" alt="logo" width={32} height={32} />
+          <img src="/logo.png" alt="logo" width={32} height={32} />
           <span>szympixel<span className="brand-accent">.demonlist</span></span>
         </Link>
 
