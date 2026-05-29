@@ -1,0 +1,112 @@
+import fs from 'fs';
+import path from 'path';
+import yaml from 'js-yaml';
+
+export interface Victor {
+  player: string;
+  link: string;
+  date: string;
+}
+
+export interface Demon {
+  id: number;
+  rank: number;
+  name: string;
+  creator: string;
+  level_id: number;
+  video: string;
+  thumbnail: string;
+  added_at: string;
+  victors: Victor[];
+}
+
+const DEMONS_PATH = path.join(process.cwd(), 'data', 'demons.yml');
+
+export function readDemons(): Demon[] {
+  const raw = fs.readFileSync(DEMONS_PATH, 'utf8');
+  const data = yaml.load(raw) as Demon[];
+  return (data || []).sort((a, b) => a.rank - b.rank);
+}
+
+export function writeDemons(demons: Demon[]): void {
+  const sorted = demons.sort((a, b) => a.rank - b.rank);
+  const raw = yaml.dump(sorted, { lineWidth: -1, quotingType: '"' });
+  fs.writeFileSync(DEMONS_PATH, raw, 'utf8');
+}
+
+export function getDemonById(id: number): Demon | undefined {
+  return readDemons().find((d) => d.id === id);
+}
+
+export function getNextId(): number {
+  const demons = readDemons();
+  return demons.length > 0 ? Math.max(...demons.map((d) => d.id)) + 1 : 1;
+}
+
+export function addDemon(demon: Omit<Demon, 'id'>): Demon {
+  const demons = readDemons();
+  const newDemon: Demon = { id: getNextId(), ...demon };
+  // Przesuń demony poniżej nowej pozycji
+  demons.forEach((d) => {
+    if (d.rank >= newDemon.rank) d.rank += 1;
+  });
+  demons.push(newDemon);
+  writeDemons(demons);
+  return newDemon;
+}
+
+export function updateDemon(id: number, updates: Partial<Omit<Demon, 'id'>>): Demon | null {
+  const demons = readDemons();
+  const idx = demons.findIndex((d) => d.id === id);
+  if (idx === -1) return null;
+
+  const oldRank = demons[idx].rank;
+  const newRank = updates.rank;
+
+  if (newRank !== undefined && newRank !== oldRank) {
+    // Przesuń inne demony
+    demons.forEach((d) => {
+      if (d.id === id) return;
+      if (newRank < oldRank) {
+        if (d.rank >= newRank && d.rank < oldRank) d.rank += 1;
+      } else {
+        if (d.rank > oldRank && d.rank <= newRank) d.rank -= 1;
+      }
+    });
+  }
+
+  demons[idx] = { ...demons[idx], ...updates };
+  writeDemons(demons);
+  return demons[idx];
+}
+
+export function deleteDemon(id: number): boolean {
+  const demons = readDemons();
+  const idx = demons.findIndex((d) => d.id === id);
+  if (idx === -1) return false;
+  const deleted = demons.splice(idx, 1)[0];
+  // Napraw ranki po usunięciu
+  demons.forEach((d) => {
+    if (d.rank > deleted.rank) d.rank -= 1;
+  });
+  writeDemons(demons);
+  return true;
+}
+
+export function addVictor(demonId: number, victor: Victor): Demon | null {
+  const demons = readDemons();
+  const demon = demons.find((d) => d.id === demonId);
+  if (!demon) return null;
+  demon.victors.push(victor);
+  writeDemons(demons);
+  return demon;
+}
+
+export function deleteVictor(demonId: number, playerName: string): Demon | null {
+  const demons = readDemons();
+  const demon = demons.find((d) => d.id === demonId);
+  if (!demon) return null;
+  demon.victors = demon.victors.filter((v) => v.player !== playerName);
+  writeDemons(demons);
+  return demon;
+}
