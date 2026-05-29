@@ -1,37 +1,9 @@
-# demonlist.szympixel.pl - Demon List Data
-# Format: każdy demon ma id, rank, nazwę, twórcę, dane YT i listę victorów
-# Aby dodać demona: skopiuj poniższy template i wypełnij pola
-# Aby dodać victora: dopisz do listy victors danego demona
-
 - id: 1
+  name: Blue World
+  creator: PINE
+  level_id: 0
+  video: https://www.youtube.com/watch?v=JkVeHaXgk5E
+  thumbnail: ""
   rank: 1
-  name: "Hypothetically"
-  creator: "Viprin"
-  level_id: 79106051
-  video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
-  added_at: "2024-01-01"
-  victors:
-    - player: "Player1"
-      link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-      date: "2024-01-05"
-
-- id: 2
-  rank: 2
-  name: "Tartarus"
-  creator: "Dolphy"
-  level_id: 67816730
-  video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
-  added_at: "2024-01-02"
-  victors: []
-
-- id: 3
-  rank: 3
-  name: "Sakupen Hell"
-  creator: "Rob Buck"
-  level_id: 22835308
-  video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  thumbnail: "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg"
-  added_at: "2024-01-03"
+  added_at: "2026-05-29"
   victors: []
