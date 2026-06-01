@@ -6,6 +6,7 @@ export interface Victor {
   player: string;
   link: string;
   date: string;
+  isVerifier?: boolean;
 }
 
 export interface Demon {
@@ -20,7 +21,20 @@ export interface Demon {
   victors: Victor[];
 }
 
+export interface Submission {
+  id: number;
+  rank: number;
+  name: string;
+  creator: string;
+  level_id: number;
+  video: string;
+  thumbnail: string;
+  submitted_at: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 const DEMONS_PATH = path.join(process.cwd(), 'data', 'demons.yml');
+const SUBMISSIONS_PATH = path.join(process.cwd(), 'data', 'submissions.yml');
 
 export function readDemons(): Demon[] {
   const raw = fs.readFileSync(DEMONS_PATH, 'utf8');
@@ -109,4 +123,49 @@ export function deleteVictor(demonId: number, playerName: string): Demon | null 
   demon.victors = demon.victors.filter((v) => v.player !== playerName);
   writeDemons(demons);
   return demon;
+}
+
+export function readSubmissions(): Submission[] {
+  if (!fs.existsSync(SUBMISSIONS_PATH)) {
+    return [];
+  }
+  const raw = fs.readFileSync(SUBMISSIONS_PATH, 'utf8');
+  const data = yaml.load(raw) as Submission[];
+  return data || [];
+}
+
+export function writeSubmissions(submissions: Submission[]): void {
+  const raw = yaml.dump(submissions, { lineWidth: -1, quotingType: '"' });
+  fs.writeFileSync(SUBMISSIONS_PATH, raw, 'utf8');
+}
+
+export function addSubmission(submission: Omit<Submission, 'id'>): Submission {
+  const submissions = readSubmissions();
+  const nextId = submissions.length > 0 ? Math.max(...submissions.map((s) => s.id)) + 1 : 1;
+  const newSubmission: Submission = { id: nextId, ...submission };
+  submissions.push(newSubmission);
+  writeSubmissions(submissions);
+  return newSubmission;
+}
+
+export function getSubmissionById(id: number): Submission | undefined {
+  return readSubmissions().find((s) => s.id === id);
+}
+
+export function updateSubmissionStatus(id: number, status: 'pending' | 'approved' | 'rejected'): Submission | null {
+  const submissions = readSubmissions();
+  const idx = submissions.findIndex((s) => s.id === id);
+  if (idx === -1) return null;
+  submissions[idx].status = status;
+  writeSubmissions(submissions);
+  return submissions[idx];
+}
+
+export function deleteSubmission(id: number): boolean {
+  const submissions = readSubmissions();
+  const idx = submissions.findIndex((s) => s.id === id);
+  if (idx === -1) return false;
+  submissions.splice(idx, 1);
+  writeSubmissions(submissions);
+  return true;
 }

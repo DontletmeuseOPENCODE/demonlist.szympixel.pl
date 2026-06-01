@@ -21,6 +21,9 @@ export default async function DemonPage({ params }: Params) {
     hdThumbnail = hdThumbnail.replace('hqdefault.jpg', 'maxresdefault.jpg');
   }
 
+  const verifier = demon.victors?.find(v => v.isVerifier);
+  const actualVictorsCount = demon.victors?.filter(v => !v.isVerifier).length || 0;
+
   return (
     <div className="demon-detail">
       <Link href="/" style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', display: 'inline-block', fontSize: '0.9rem' }}>
@@ -65,7 +68,29 @@ export default async function DemonPage({ params }: Params) {
         </div>
       </div>
 
-      <h2 className="section-title">Lista Zwycięzców ({demon.victors?.length || 0})</h2>
+      {verifier && (
+        <div className="verifier-box" style={{ 
+          background: 'rgba(233, 69, 96, 0.08)', 
+          border: '1px solid var(--border-accent)', 
+          borderRadius: '8px', 
+          padding: '1.2rem', 
+          marginBottom: '2rem', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '0.4rem',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
+        }}>
+          <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-dim)' }}>Oficjalny Weryfikator</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--accent)' }}>{verifier.player}</span>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+              Data weryfikacji: <strong>{new Date(verifier.date).toLocaleDateString('pl-PL')}</strong>
+            </span>
+          </div>
+        </div>
+      )}
+
+      <h2 className="section-title">Lista Zwycięzców ({actualVictorsCount})</h2>
       <VictorList victors={demon.victors || []} />
     </div>
   );
