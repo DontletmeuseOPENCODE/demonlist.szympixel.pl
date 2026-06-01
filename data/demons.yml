@@ -3,7 +3,10 @@
   creator: PINE
   level_id: 0
   video: https://www.youtube.com/watch?v=JkVeHaXgk5E
-  thumbnail: ""
+  thumbnail: "https://img.youtube.com/vi/JkVeHaXgk5E/hqdefault.jpg"
   rank: 1
   added_at: "2026-05-29"
-  victors: []
+  victors:
+    - player: FriskieBOI
+      link: https://www.youtube.com/watch?v=JkVeHaXgk5E
+      date: "2026-05-24"

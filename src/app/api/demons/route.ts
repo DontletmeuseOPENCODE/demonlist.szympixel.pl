@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { readDemons, addDemon } from '@/lib/yaml';
+import { getYouTubeThumbnail } from '@/lib/youtube';
 
 export async function GET() {
   try {
@@ -19,12 +20,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Brakuje wymaganych pól: name, creator, rank' }, { status: 400 });
     }
 
+    let finalThumbnail = thumbnail || '';
+    if (!finalThumbnail && video) {
+      finalThumbnail = getYouTubeThumbnail(video) || '';
+    }
+
     const newDemon = addDemon({
       name,
       creator,
       level_id: Number(level_id) || 0,
       video: video || '',
-      thumbnail: thumbnail || '',
+      thumbnail: finalThumbnail,
       rank: Number(rank),
       added_at: new Date().toISOString().split('T')[0],
       victors: [],
