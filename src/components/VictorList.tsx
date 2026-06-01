@@ -3,12 +3,14 @@
 import type { Victor } from '@/lib/yaml';
 
 export default function VictorList({ victors }: { victors: Victor[] }) {
-  if (!victors || victors.length === 0) {
+  const actualVictors = (victors || []).filter(v => !v.isVerifier);
+
+  if (actualVictors.length === 0) {
     return <div className="no-victors">Brak udokumentowanych ukończeń dla tego poziomu.</div>;
   }
 
   // Sortowanie po dacie (najstarsze pierwsze, czyli najszybsi victorzy)
-  const sortedVictors = [...victors].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const sortedVictors = [...actualVictors].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return (
     <div className="victors-list">
