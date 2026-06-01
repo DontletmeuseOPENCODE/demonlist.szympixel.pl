@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDemonById, updateDemon, deleteDemon } from '@/lib/yaml';
+import { getYouTubeThumbnail } from '@/lib/youtube';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -16,6 +17,15 @@ export async function PATCH(request: Request, { params }: Params) {
   try {
     const { id } = await params;
     const body = await request.json();
+
+    // Check if thumbnail needs to be auto-generated
+    if (body.thumbnail === '' || !body.thumbnail) {
+      const videoUrl = body.video || getDemonById(Number(id))?.video;
+      if (videoUrl) {
+        body.thumbnail = getYouTubeThumbnail(videoUrl) || '';
+      }
+    }
+
     const updated = updateDemon(Number(id), body);
     if (!updated) return NextResponse.json({ error: 'Nie znaleziono' }, { status: 404 });
     return NextResponse.json(updated);
