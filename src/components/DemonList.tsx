@@ -8,6 +8,7 @@ export default function DemonList() {
   const [demons, setDemons] = useState<Demon[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     async function fetchDemons() {
@@ -29,11 +30,33 @@ export default function DemonList() {
   if (error) return <div style={{ color: 'var(--accent)', textAlign: 'center', padding: '2rem' }}>{error}</div>;
   if (demons.length === 0) return <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Lista jest jeszcze pusta.</div>;
 
+  const filtered = demons.filter((d) =>
+    d.name.toLowerCase().includes(search.toLowerCase()) ||
+    d.creator.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="demon-list">
-      {demons.map((demon) => (
-        <DemonCard key={demon.id} demon={demon} />
-      ))}
+    <div className="demon-list-wrapper">
+      <div className="challenge-search-wrapper" style={{ marginBottom: '1rem' }}>
+        <input
+          type="text"
+          className="challenge-search"
+          placeholder="Szukaj demona po nazwie lub twórcy..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      <div className="demon-list">
+        {filtered.map((demon) => (
+          <DemonCard key={demon.id} demon={demon} />
+        ))}
+        {filtered.length === 0 && demons.length > 0 && (
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+            Brak wyników dla tego wyszukiwania.
+          </div>
+        )}
+      </div>
     </div>
   );
 }

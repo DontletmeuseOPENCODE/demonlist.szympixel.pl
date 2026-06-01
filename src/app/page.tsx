@@ -4,10 +4,10 @@ export default function Home() {
   return (
     <>
       <header className="demonlist-header">
-        <h1 className="demonlist-title">Demonlist</h1>
-        <p className="demonlist-subtitle">Lista najtrudniejszych ukończonych demonów.</p>
+        <h1 className="demonlist-title">FriskieList</h1>
+        <p className="demonlist-subtitle">Lista najtrudniejszych demonów w Geometry Dash (ustalana przez community)</p>
       </header>
-      
+
       <DemonList />
     </>
   );

@@ -33,8 +33,19 @@ export interface Submission {
   status: 'pending' | 'approved' | 'rejected';
 }
 
+export interface Challenge {
+  id: number;
+  rank: number;
+  name: string;
+  creator: string;
+  level_id: number;
+  added_at: string;
+  victors: Victor[];
+}
+
 const DEMONS_PATH = path.join(process.cwd(), 'data', 'demons.yml');
 const SUBMISSIONS_PATH = path.join(process.cwd(), 'data', 'submissions.yml');
+const CHALLENGES_PATH = path.join(process.cwd(), 'data', 'challenges.yml');
 
 export function readDemons(): Demon[] {
   const raw = fs.readFileSync(DEMONS_PATH, 'utf8');
@@ -168,4 +179,95 @@ export function deleteSubmission(id: number): boolean {
   submissions.splice(idx, 1);
   writeSubmissions(submissions);
   return true;
+}
+
+// ─── Challenges CRUD ───
+
+export function readChallenges(): Challenge[] {
+  if (!fs.existsSync(CHALLENGES_PATH)) {
+    return [];
+  }
+  const raw = fs.readFileSync(CHALLENGES_PATH, 'utf8');
+  const data = yaml.load(raw) as Challenge[];
+  return (data || []).sort((a, b) => a.rank - b.rank);
+}
+
+export function writeChallenges(challenges: Challenge[]): void {
+  const sorted = challenges.sort((a, b) => a.rank - b.rank);
+  const raw = yaml.dump(sorted, { lineWidth: -1, quotingType: '"' });
+  fs.writeFileSync(CHALLENGES_PATH, raw, 'utf8');
+}
+
+export function getChallengeById(id: number): Challenge | undefined {
+  return readChallenges().find((c) => c.id === id);
+}
+
+export function getNextChallengeId(): number {
+  const challenges = readChallenges();
+  return challenges.length > 0 ? Math.max(...challenges.map((c) => c.id)) + 1 : 1;
+}
+
+export function addChallenge(challenge: Omit<Challenge, 'id'>): Challenge {
+  const challenges = readChallenges();
+  const newChallenge: Challenge = { id: getNextChallengeId(), ...challenge };
+  challenges.forEach((c) => {
+    if (c.rank >= newChallenge.rank) c.rank += 1;
+  });
+  challenges.push(newChallenge);
+  writeChallenges(challenges);
+  return newChallenge;
+}
+
+export function updateChallenge(id: number, updates: Partial<Omit<Challenge, 'id'>>): Challenge | null {
+  const challenges = readChallenges();
+  const idx = challenges.findIndex((c) => c.id === id);
+  if (idx === -1) return null;
+
+  const oldRank = challenges[idx].rank;
+  const newRank = updates.rank;
+
+  if (newRank !== undefined && newRank !== oldRank) {
+    challenges.forEach((c) => {
+      if (c.id === id) return;
+      if (newRank < oldRank) {
+        if (c.rank >= newRank && c.rank < oldRank) c.rank += 1;
+      } else {
+        if (c.rank > oldRank && c.rank <= newRank) c.rank -= 1;
+      }
+    });
+  }
+
+  challenges[idx] = { ...challenges[idx], ...updates };
+  writeChallenges(challenges);
+  return challenges[idx];
+}
+
+export function deleteChallenge(id: number): boolean {
+  const challenges = readChallenges();
+  const idx = challenges.findIndex((c) => c.id === id);
+  if (idx === -1) return false;
+  const deleted = challenges.splice(idx, 1)[0];
+  challenges.forEach((c) => {
+    if (c.rank > deleted.rank) c.rank -= 1;
+  });
+  writeChallenges(challenges);
+  return true;
+}
+
+export function addChallengeVictor(challengeId: number, victor: Victor): Challenge | null {
+  const challenges = readChallenges();
+  const challenge = challenges.find((c) => c.id === challengeId);
+  if (!challenge) return null;
+  challenge.victors.push(victor);
+  writeChallenges(challenges);
+  return challenge;
+}
+
+export function deleteChallengeVictor(challengeId: number, playerName: string): Challenge | null {
+  const challenges = readChallenges();
+  const challenge = challenges.find((c) => c.id === challengeId);
+  if (!challenge) return null;
+  challenge.victors = challenge.victors.filter((v) => v.player !== playerName);
+  writeChallenges(challenges);
+  return challenge;
 }

@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function AddVictorForm({ demonId, demonName, onClose }: { demonId: number, demonName: string, onClose: () => void }) {
+export default function AddVictorForm({ demonId, demonName, onClose, apiEndpoint }: { demonId: number, demonName: string, onClose: () => void, apiEndpoint?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,13 +29,15 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
     setError('');
 
     try {
-      const res = await fetch('/api/victors', {
+      const url = apiEndpoint || '/api/victors';
+      const payload = apiEndpoint 
+        ? { ...formData }
+        : { demon_id: demonId, ...formData };
+
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          demon_id: demonId,
-          ...formData
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {

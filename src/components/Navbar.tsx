@@ -23,6 +23,7 @@ export default function Navbar({ user }: NavbarProps) {
 
   const links = [
     { href: '/', label: 'Demonlist' },
+    { href: '/challenges', label: 'FB Challenges' },
   ];
 
   return (
@@ -31,7 +32,7 @@ export default function Navbar({ user }: NavbarProps) {
         <div className="navbar-inner">
           <Link href="/" className="navbar-brand">
             <img src="/logo.png" alt="logo" width={32} height={32} />
-            <span>szympixel<span className="brand-accent">.demonlist</span></span>
+            <span>Friskie<span className="brand-accent">List</span></span>
           </Link>
 
           <button
