@@ -23,6 +23,7 @@ export default function Navbar({ user }: NavbarProps) {
 
   const links = [
     { href: '/', label: 'Demonlist' },
+    { href: '/challenges', label: 'FB Challenges' },
   ];
 
   return (
@@ -47,7 +48,7 @@ export default function Navbar({ user }: NavbarProps) {
               <Link
                 key={l.href}
                 href={l.href}
-                className={`nav-link ${pathname === l.href ? 'active' : ''}`}
+                className={`nav-link ${pathname === l.href || pathname.startsWith(l.href + '/') ? 'active' : ''}`}
                 onClick={() => setMenuOpen(false)}
               >
                 {l.label}

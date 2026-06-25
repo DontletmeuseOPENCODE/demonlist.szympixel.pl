@@ -20,7 +20,8 @@ export async function middleware(request: NextRequest) {
   const isApiProtected =
     pathname.startsWith('/api/demons') ||
     pathname.startsWith('/api/victors') ||
-    pathname.startsWith('/api/users');
+    pathname.startsWith('/api/users') ||
+    pathname.startsWith('/api/fb-challenges');
 
   if (!isAdminRoute && !isApiProtected) {
     return NextResponse.next();
@@ -34,6 +35,9 @@ export async function middleware(request: NextRequest) {
     if (isAdminRoute) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
+    if (request.method === 'GET') {
+      return NextResponse.next();
+    }
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -43,7 +47,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }
     if (
-      (pathname.startsWith('/api/demons') || pathname.startsWith('/api/users')) &&
+      (pathname.startsWith('/api/demons') || pathname.startsWith('/api/users') || pathname.startsWith('/api/fb-challenges')) &&
       request.method !== 'GET'
     ) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -54,5 +58,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/demons/:path*', '/api/victors/:path*', '/api/users/:path*'],
+  matcher: ['/admin/:path*', '/api/demons/:path*', '/api/victors/:path*', '/api/users/:path*', '/api/fb-challenges/:path*'],
 };
