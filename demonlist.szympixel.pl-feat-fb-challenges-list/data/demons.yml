@@ -1,0 +1,35 @@
+- id: 1
+  name: Blue World
+  creator: PINE
+  level_id: 0
+  video: https://www.youtube.com/watch?v=JkVeHaXgk5E
+  thumbnail: https://img.youtube.com/vi/JkVeHaXgk5E/hqdefault.jpg
+  rank: 1
+  added_at: "2026-05-29"
+  victors:
+    - player: FriskieBOI
+      link: https://www.youtube.com/watch?v=JkVeHaXgk5E
+      date: "2026-05-24"
+      isVerifier: true
+- id: 2
+  name: Stereo Circles
+  creator: PINE
+  level_id: 135400406
+  video: https://www.youtube.com/watch?v=SG6Ggmqx31s
+  thumbnail: https://img.youtube.com/vi/SG6Ggmqx31s/hqdefault.jpg
+  rank: 2
+  added_at: "2026-06-01"
+  victors:
+    - player: FriskieBOI
+      link: ""
+      date: "2026-03-18"
+      isVerifier: true
+- id: 3
+  name: PUZZLE TIME
+  creator: sub2kurekk
+  level_id: 135281616
+  video: https://www.youtube.com/watch?v=Hh5d-Ojva70
+  thumbnail: https://img.youtube.com/vi/Hh5d-Ojva70/hqdefault.jpg
+  rank: 3
+  added_at: "2026-06-01"
+  victors: []

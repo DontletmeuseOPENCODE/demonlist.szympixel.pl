@@ -1,0 +1,9 @@
+# Konta użytkowników demonlisty
+# NIGDY nie commituj plaintext haseł – używaj tylko bcrypt hashów
+# Aby wygenerować hash: npm run hash-password <twoje-haslo>
+# Role: admin (wszystko), moderator (tylko dodawanie victorów)
+
+- username: "admin"
+  # domyślne hasło: "alabamas"
+  password_hash: "$2b$12$HhSNec.YTy7DFRoep3u2keHBM0SYsWc.Ayod76Mb5ZcnFjZ.5Cf.S"
+  role: "admin"
