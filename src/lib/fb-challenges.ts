@@ -16,6 +16,16 @@ export interface FbChallenge {
   video: string;
   thumbnail: string;
   added_at: string;
+  // Pointercrate-style metadata (all optional, empty string = brak danych)
+  level_password: string;
+  level_length: string;
+  object_count: number;
+  difficulty: string;
+  gd_version: string;
+  song_name: string;
+  song_author: string;
+  song_id: number;
+  song_url: string;
 }
 
 const FB_CHALLENGES_PATH = path.join(process.cwd(), 'data', 'fb-challenges.yml');

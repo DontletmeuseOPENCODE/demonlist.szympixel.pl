@@ -1,4 +1,5 @@
 import { getDemonById } from '@/lib/yaml';
+import { getNewgroundsSongUrl } from '@/lib/youtube';
 import { notFound } from 'next/navigation';
 import VictorList from '@/components/VictorList';
 import Link from 'next/link';
@@ -60,12 +61,51 @@ export default async function DemonPage({ params }: Params) {
         </div>
         <div className="meta-item">
           <span className="meta-label">Level ID</span>
-          <span className="meta-value">{demon.level_id || 'N/A'}</span>
+          <span className="meta-value">{demon.level_id || '—'}</span>
         </div>
         <div className="meta-item">
           <span className="meta-label">Dodano</span>
           <span className="meta-value">{new Date(demon.added_at).toLocaleDateString('pl-PL')}</span>
         </div>
+      </div>
+
+      <div className="demon-detail-meta">
+        <div className="meta-item">
+          <span className="meta-label">Level Password</span>
+          <span className="meta-value">{demon.level_password || '—'}</span>
+        </div>
+        <div className="meta-item">
+          <span className="meta-label">Level Length</span>
+          <span className="meta-value">{demon.level_length || '—'}</span>
+        </div>
+        <div className="meta-item">
+          <span className="meta-label">Object Count</span>
+          <span className="meta-value">{demon.object_count ? demon.object_count.toLocaleString('pl-PL') : '—'}</span>
+        </div>
+        <div className="meta-item">
+          <span className="meta-label">In-Game Difficulty</span>
+          <span className="meta-value">{demon.difficulty || '—'}</span>
+        </div>
+        <div className="meta-item">
+          <span className="meta-label">Created In</span>
+          <span className="meta-value">{demon.gd_version || '—'}</span>
+        </div>
+        {(demon.song_url || demon.song_id) && (
+          <div className="meta-item">
+            <span className="meta-label">Newgrounds Song</span>
+            <span className="meta-value">
+              <a
+                href={demon.song_url || getNewgroundsSongUrl(demon.song_id) || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {demon.song_name || 'Utwór'}
+                {demon.song_author && ` by ${demon.song_author}`}
+                {demon.song_id && ` (ID ${demon.song_id})`} ↗
+              </a>
+            </span>
+          </div>
+        )}
       </div>
 
       {verifier && (

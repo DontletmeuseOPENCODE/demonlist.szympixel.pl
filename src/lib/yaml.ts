@@ -19,6 +19,16 @@ export interface Demon {
   thumbnail: string;
   added_at: string;
   victors: Victor[];
+  // Pointercrate-style metadata (all optional, empty string = brak danych)
+  level_password: string;
+  level_length: string;
+  object_count: number;
+  difficulty: string;
+  gd_version: string;
+  song_name: string;
+  song_author: string;
+  song_id: number;
+  song_url: string;
 }
 
 export interface Submission {
@@ -31,6 +41,16 @@ export interface Submission {
   thumbnail: string;
   submitted_at: string;
   status: 'pending' | 'approved' | 'rejected';
+  // Pointercrate-style metadata (all optional)
+  level_password?: string;
+  level_length?: string;
+  object_count?: number;
+  difficulty?: string;
+  gd_version?: string;
+  song_name?: string;
+  song_author?: string;
+  song_id?: number;
+  song_url?: string;
 }
 
 const DEMONS_PATH = path.join(process.cwd(), 'data', 'demons.yml');

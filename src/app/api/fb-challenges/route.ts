@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { readFbChallenges, addFbChallenge } from '@/lib/fb-challenges';
-import { getYouTubeThumbnail } from '@/lib/youtube';
+import { getYouTubeThumbnail, getNewgroundsSongId } from '@/lib/youtube';
 
 export async function GET() {
   try {
@@ -35,6 +35,15 @@ export async function POST(request: Request) {
       thumbnail: finalThumbnail,
       rank: Number(rank),
       added_at: new Date().toISOString().split('T')[0],
+      level_password: body.level_password || '',
+      level_length: body.level_length || '',
+      object_count: Number(body.object_count) || 0,
+      difficulty: body.difficulty || '',
+      gd_version: body.gd_version || '',
+      song_name: body.song_name || '',
+      song_author: body.song_author || '',
+      song_id: Number(body.song_id) || Number(getNewgroundsSongId(body.song_url)) || 0,
+      song_url: body.song_url || '',
     });
 
     return NextResponse.json(newChallenge, { status: 201 });

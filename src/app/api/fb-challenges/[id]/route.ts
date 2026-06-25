@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getFbChallengeById, updateFbChallenge, deleteFbChallenge } from '@/lib/fb-challenges';
-import { getYouTubeThumbnail } from '@/lib/youtube';
+import { getYouTubeThumbnail, getNewgroundsSongId } from '@/lib/youtube';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -24,6 +24,11 @@ export async function PATCH(request: Request, { params }: Params) {
       if (videoUrl) {
         body.thumbnail = getYouTubeThumbnail(videoUrl) || '';
       }
+    }
+
+    // Jeżeli podano nowy song_url, ale song_id puste — wyciągnij ID z URL
+    if (body.song_url && !body.song_id) {
+      body.song_id = Number(getNewgroundsSongId(body.song_url)) || 0;
     }
 
     const updated = updateFbChallenge(Number(id), body);

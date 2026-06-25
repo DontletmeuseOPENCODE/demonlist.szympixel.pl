@@ -1,4 +1,5 @@
 import { getFbChallengeById } from '@/lib/fb-challenges';
+import { getNewgroundsSongUrl } from '@/lib/youtube';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -91,12 +92,51 @@ export default async function ChallengePage({ params }: Params) {
         </div>
         <div className="meta-item">
           <span className="meta-label">Level ID</span>
-          <span className="meta-value">{challenge.level_id || 'N/A'}</span>
+          <span className="meta-value">{challenge.level_id || '—'}</span>
         </div>
         <div className="meta-item">
           <span className="meta-label">Dodano</span>
           <span className="meta-value">{new Date(challenge.added_at).toLocaleDateString('pl-PL')}</span>
         </div>
+      </div>
+
+      <div className="demon-detail-meta">
+        <div className="meta-item">
+          <span className="meta-label">Level Password</span>
+          <span className="meta-value">{challenge.level_password || '—'}</span>
+        </div>
+        <div className="meta-item">
+          <span className="meta-label">Level Length</span>
+          <span className="meta-value">{challenge.level_length || '—'}</span>
+        </div>
+        <div className="meta-item">
+          <span className="meta-label">Object Count</span>
+          <span className="meta-value">{challenge.object_count ? challenge.object_count.toLocaleString('pl-PL') : '—'}</span>
+        </div>
+        <div className="meta-item">
+          <span className="meta-label">In-Game Difficulty</span>
+          <span className="meta-value">{challenge.difficulty || '—'}</span>
+        </div>
+        <div className="meta-item">
+          <span className="meta-label">Created In</span>
+          <span className="meta-value">{challenge.gd_version || '—'}</span>
+        </div>
+        {(challenge.song_url || challenge.song_id) && (
+          <div className="meta-item">
+            <span className="meta-label">Newgrounds Song</span>
+            <span className="meta-value">
+              <a
+                href={challenge.song_url || getNewgroundsSongUrl(challenge.song_id) || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {challenge.song_name || 'Utwór'}
+                {challenge.song_author && ` by ${challenge.song_author}`}
+                {challenge.song_id && ` (ID ${challenge.song_id})`} ↗
+              </a>
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

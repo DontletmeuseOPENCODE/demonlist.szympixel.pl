@@ -15,7 +15,15 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
     level_id: demon.level_id?.toString() || '',
     video: demon.video || '',
     thumbnail: demon.thumbnail || '',
-    rank: demon.rank.toString()
+    rank: demon.rank.toString(),
+    level_password: demon.level_password || '',
+    level_length: demon.level_length || '',
+    object_count: demon.object_count?.toString() || '',
+    difficulty: demon.difficulty || '',
+    gd_version: demon.gd_version || '',
+    song_name: demon.song_name || '',
+    song_author: demon.song_author || '',
+    song_url: demon.song_url || '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +42,8 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
         body: JSON.stringify({
           ...formData,
           level_id: Number(formData.level_id) || 0,
-          rank: Number(formData.rank)
+          rank: Number(formData.rank),
+          object_count: Number(formData.object_count) || 0,
         }),
       });
 
@@ -82,6 +91,44 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
           <div className="form-group">
             <label>URL Miniaturki</label>
             <input type="url" name="thumbnail" value={formData.thumbnail} onChange={handleChange} />
+          </div>
+
+          <h3 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontFamily: 'Rajdhani, sans-serif', color: 'var(--accent)' }}>Metadane poziomu</h3>
+
+          <div className="form-group">
+            <label>Level Password</label>
+            <input type="text" name="level_password" value={formData.level_password} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Level Length</label>
+            <input type="text" name="level_length" value={formData.level_length} onChange={handleChange} placeholder='np. "1m:07s"' />
+          </div>
+          <div className="form-group">
+            <label>Object Count</label>
+            <input type="number" name="object_count" value={formData.object_count} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>In-Game Difficulty</label>
+            <input type="text" name="difficulty" value={formData.difficulty} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Created In (wersja GD)</label>
+            <input type="text" name="gd_version" value={formData.gd_version} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Newgrounds Song — nazwa</label>
+            <input type="text" name="song_name" value={formData.song_name} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Newgrounds Song — autor</label>
+            <input type="text" name="song_author" value={formData.song_author} onChange={handleChange} />
+          </div>
+          <div className="form-group">
+            <label>Link do utworu na Newgrounds</label>
+            <input type="url" name="song_url" value={formData.song_url} onChange={handleChange} placeholder="https://www.newgrounds.com/audio/listen/48911" />
+            <small style={{ color: 'var(--text-dim)', fontSize: '0.75rem', marginTop: '0.3rem', display: 'block' }}>
+              Klikalny link do muzyczki — ID wyciągane automatycznie z URL
+            </small>
           </div>
           
           <div className="modal-actions">
