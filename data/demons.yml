@@ -3,10 +3,27 @@
   creator: PINE
   level_id: 0
   video: https://www.youtube.com/watch?v=JkVeHaXgk5E
-  thumbnail: "https://img.youtube.com/vi/JkVeHaXgk5E/hqdefault.jpg"
+  thumbnail: https://img.youtube.com/vi/JkVeHaXgk5E/hqdefault.jpg
   rank: 1
   added_at: "2026-05-29"
+  level_password: ""
+  level_length: ""
+  object_count: 0
+  difficulty: ""
+  gd_version: ""
+  song_name: ""
+  song_author: ""
+  song_id: 0
+  song_url: ""
   victors:
     - player: FriskieBOI
       link: https://www.youtube.com/watch?v=JkVeHaXgk5E
       date: "2026-05-24"
+    - player: FriskieBOI
+      link: ""
+      date: "2026-06-04"
+      isVerifier: true
+    - player: NewHolderPL
+      link: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+      date: "2026-06-25"
+      isVerifier: false

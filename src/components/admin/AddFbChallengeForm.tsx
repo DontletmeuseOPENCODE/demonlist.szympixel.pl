@@ -2,28 +2,27 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Demon } from '@/lib/yaml';
 
-export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClose: () => void }) {
+export default function AddFbChallengeForm({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [formData, setFormData] = useState({
-    name: demon.name,
-    creator: demon.creator,
-    level_id: demon.level_id?.toString() || '',
-    video: demon.video || '',
-    thumbnail: demon.thumbnail || '',
-    rank: demon.rank.toString(),
-    level_password: demon.level_password || '',
-    level_length: demon.level_length || '',
-    object_count: demon.object_count?.toString() || '',
-    difficulty: demon.difficulty || '',
-    gd_version: demon.gd_version || '',
-    song_name: demon.song_name || '',
-    song_author: demon.song_author || '',
-    song_url: demon.song_url || '',
+    name: '',
+    creator: '',
+    level_id: '',
+    video: '',
+    thumbnail: '',
+    rank: '',
+    level_password: '',
+    level_length: '',
+    object_count: '',
+    difficulty: '',
+    gd_version: '',
+    song_name: '',
+    song_author: '',
+    song_url: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,15 +35,10 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
     setError('');
 
     try {
-      const res = await fetch(`/api/demons/${demon.id}`, {
-        method: 'PATCH',
+      const res = await fetch('/api/fb-challenges', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          level_id: Number(formData.level_id) || 0,
-          rank: Number(formData.rank),
-          object_count: Number(formData.object_count) || 0,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (!res.ok) {
@@ -63,10 +57,10 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal">
-        <h2 className="modal-title">Edytuj Demona: {demon.name}</h2>
-        
+        <h2 className="modal-title">Dodaj FB Challenge</h2>
+
         {error && <div className="login-error">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Pozycja (Rank)</label>
@@ -81,23 +75,23 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
             <input type="text" name="creator" value={formData.creator} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label>Level ID</label>
+            <label>Level ID (opcjonalne)</label>
             <input type="number" name="level_id" value={formData.level_id} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label>Link do Wideo (YouTube)</label>
-            <input type="url" name="video" value={formData.video} onChange={handleChange} />
+            <label>Link do Wideo (YouTube, opcjonalne)</label>
+            <input type="url" name="video" value={formData.video} onChange={handleChange} placeholder="Zostaw puste — challenge bez showcase" />
           </div>
           <div className="form-group">
-            <label>URL Miniaturki</label>
-            <input type="url" name="thumbnail" value={formData.thumbnail} onChange={handleChange} />
+            <label>URL Miniaturki (opcjonalne)</label>
+            <input type="url" name="thumbnail" value={formData.thumbnail} onChange={handleChange} placeholder="Zostaw puste — domyślna zostanie pobrana z YT" />
           </div>
 
           <h3 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontFamily: 'Rajdhani, sans-serif', color: 'var(--accent)' }}>Metadane poziomu</h3>
 
           <div className="form-group">
             <label>Level Password</label>
-            <input type="text" name="level_password" value={formData.level_password} onChange={handleChange} />
+            <input type="text" name="level_password" value={formData.level_password} onChange={handleChange} placeholder='np. "Free Copy"' />
           </div>
           <div className="form-group">
             <label>Level Length</label>
@@ -105,23 +99,23 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
           </div>
           <div className="form-group">
             <label>Object Count</label>
-            <input type="number" name="object_count" value={formData.object_count} onChange={handleChange} />
+            <input type="number" name="object_count" value={formData.object_count} onChange={handleChange} placeholder='np. 139568' />
           </div>
           <div className="form-group">
             <label>In-Game Difficulty</label>
-            <input type="text" name="difficulty" value={formData.difficulty} onChange={handleChange} />
+            <input type="text" name="difficulty" value={formData.difficulty} onChange={handleChange} placeholder='np. "Extreme Demon"' />
           </div>
           <div className="form-group">
             <label>Created In (wersja GD)</label>
-            <input type="text" name="gd_version" value={formData.gd_version} onChange={handleChange} />
+            <input type="text" name="gd_version" value={formData.gd_version} onChange={handleChange} placeholder='np. "2.2"' />
           </div>
           <div className="form-group">
             <label>Newgrounds Song — nazwa</label>
-            <input type="text" name="song_name" value={formData.song_name} onChange={handleChange} />
+            <input type="text" name="song_name" value={formData.song_name} onChange={handleChange} placeholder='np. "Nuke Powder"' />
           </div>
           <div className="form-group">
             <label>Newgrounds Song — autor</label>
-            <input type="text" name="song_author" value={formData.song_author} onChange={handleChange} />
+            <input type="text" name="song_author" value={formData.song_author} onChange={handleChange} placeholder='np. "MaelouX"' />
           </div>
           <div className="form-group">
             <label>Link do utworu na Newgrounds</label>
@@ -130,10 +124,10 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
               Klikalny link do muzyczki — ID wyciągane automatycznie z URL
             </small>
           </div>
-          
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>Anuluj</button>
-            <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Zapisywanie...' : 'Zapisz Zmiany'}</button>
+            <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Zapisywanie...' : 'Zapisz'}</button>
           </div>
         </form>
       </div>

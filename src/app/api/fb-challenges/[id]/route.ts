@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDemonById, updateDemon, deleteDemon } from '@/lib/yaml';
+import { getFbChallengeById, updateFbChallenge, deleteFbChallenge } from '@/lib/fb-challenges';
 import { getYouTubeThumbnail, getNewgroundsSongId } from '@/lib/youtube';
 
 interface Params {
@@ -8,9 +8,9 @@ interface Params {
 
 export async function GET(_req: Request, { params }: Params) {
   const { id } = await params;
-  const demon = getDemonById(Number(id));
-  if (!demon) return NextResponse.json({ error: 'Nie znaleziono' }, { status: 404 });
-  return NextResponse.json(demon);
+  const challenge = getFbChallengeById(Number(id));
+  if (!challenge) return NextResponse.json({ error: 'Nie znaleziono' }, { status: 404 });
+  return NextResponse.json(challenge);
 }
 
 export async function PATCH(request: Request, { params }: Params) {
@@ -18,9 +18,9 @@ export async function PATCH(request: Request, { params }: Params) {
     const { id } = await params;
     const body = await request.json();
 
-    // Check if thumbnail needs to be auto-generated
-    if (body.thumbnail === '' || !body.thumbnail) {
-      const videoUrl = body.video || getDemonById(Number(id))?.video;
+    // Jeżeli thumbnail pusty i mamy video — auto-generuj miniaturkę
+    if ((body.thumbnail === '' || !body.thumbnail) && (body.video || getFbChallengeById(Number(id))?.video)) {
+      const videoUrl = body.video || getFbChallengeById(Number(id))?.video || '';
       if (videoUrl) {
         body.thumbnail = getYouTubeThumbnail(videoUrl) || '';
       }
@@ -31,7 +31,7 @@ export async function PATCH(request: Request, { params }: Params) {
       body.song_id = Number(getNewgroundsSongId(body.song_url)) || 0;
     }
 
-    const updated = updateDemon(Number(id), body);
+    const updated = updateFbChallenge(Number(id), body);
     if (!updated) return NextResponse.json({ error: 'Nie znaleziono' }, { status: 404 });
     return NextResponse.json(updated);
   } catch {
@@ -41,7 +41,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
 export async function DELETE(_req: Request, { params }: Params) {
   const { id } = await params;
-  const ok = deleteDemon(Number(id));
+  const ok = deleteFbChallenge(Number(id));
   if (!ok) return NextResponse.json({ error: 'Nie znaleziono' }, { status: 404 });
   return NextResponse.json({ ok: true });
 }

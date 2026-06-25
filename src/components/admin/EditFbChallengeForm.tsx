@@ -2,28 +2,28 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Demon } from '@/lib/yaml';
+import type { FbChallenge } from '@/lib/fb-challenges';
 
-export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClose: () => void }) {
+export default function EditFbChallengeForm({ challenge, onClose }: { challenge: FbChallenge, onClose: () => void }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [formData, setFormData] = useState({
-    name: demon.name,
-    creator: demon.creator,
-    level_id: demon.level_id?.toString() || '',
-    video: demon.video || '',
-    thumbnail: demon.thumbnail || '',
-    rank: demon.rank.toString(),
-    level_password: demon.level_password || '',
-    level_length: demon.level_length || '',
-    object_count: demon.object_count?.toString() || '',
-    difficulty: demon.difficulty || '',
-    gd_version: demon.gd_version || '',
-    song_name: demon.song_name || '',
-    song_author: demon.song_author || '',
-    song_url: demon.song_url || '',
+    name: challenge.name,
+    creator: challenge.creator,
+    level_id: challenge.level_id?.toString() || '',
+    video: challenge.video || '',
+    thumbnail: challenge.thumbnail || '',
+    rank: challenge.rank.toString(),
+    level_password: challenge.level_password || '',
+    level_length: challenge.level_length || '',
+    object_count: challenge.object_count?.toString() || '',
+    difficulty: challenge.difficulty || '',
+    gd_version: challenge.gd_version || '',
+    song_name: challenge.song_name || '',
+    song_author: challenge.song_author || '',
+    song_url: challenge.song_url || '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,14 +36,13 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
     setError('');
 
     try {
-      const res = await fetch(`/api/demons/${demon.id}`, {
+      const res = await fetch(`/api/fb-challenges/${challenge.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
           level_id: Number(formData.level_id) || 0,
           rank: Number(formData.rank),
-          object_count: Number(formData.object_count) || 0,
         }),
       });
 
@@ -63,10 +62,10 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal">
-        <h2 className="modal-title">Edytuj Demona: {demon.name}</h2>
-        
+        <h2 className="modal-title">Edytuj FB Challenge: {challenge.name}</h2>
+
         {error && <div className="login-error">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Pozycja (Rank)</label>
@@ -81,16 +80,16 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
             <input type="text" name="creator" value={formData.creator} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label>Level ID</label>
+            <label>Level ID (opcjonalne)</label>
             <input type="number" name="level_id" value={formData.level_id} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label>Link do Wideo (YouTube)</label>
-            <input type="url" name="video" value={formData.video} onChange={handleChange} />
+            <label>Link do Wideo (YouTube, opcjonalne)</label>
+            <input type="url" name="video" value={formData.video} onChange={handleChange} placeholder="Zostaw puste — challenge bez showcase" />
           </div>
           <div className="form-group">
-            <label>URL Miniaturki</label>
-            <input type="url" name="thumbnail" value={formData.thumbnail} onChange={handleChange} />
+            <label>URL Miniaturki (opcjonalne)</label>
+            <input type="url" name="thumbnail" value={formData.thumbnail} onChange={handleChange} placeholder="Zostaw puste — domyślna zostanie pobrana z YT" />
           </div>
 
           <h3 style={{ marginTop: '1rem', marginBottom: '0.5rem', fontFamily: 'Rajdhani, sans-serif', color: 'var(--accent)' }}>Metadane poziomu</h3>
@@ -130,7 +129,7 @@ export default function EditDemonForm({ demon, onClose }: { demon: Demon, onClos
               Klikalny link do muzyczki — ID wyciągane automatycznie z URL
             </small>
           </div>
-          
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>Anuluj</button>
             <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Zapisywanie...' : 'Zapisz Zmiany'}</button>
