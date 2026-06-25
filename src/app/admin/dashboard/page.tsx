@@ -8,6 +8,7 @@ import EditDemonForm from '@/components/admin/EditDemonForm';
 import AddVictorForm from '@/components/admin/AddVictorForm';
 import MergeSubmissionForm from '@/components/admin/MergeSubmissionForm';
 import AddFbChallengeForm from '@/components/admin/AddFbChallengeForm';
+import EditFbChallengeForm from '@/components/admin/EditFbChallengeForm';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
@@ -21,6 +22,7 @@ export default function AdminDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddFbChallengeForm, setShowAddFbChallengeForm] = useState(false);
   const [editDemon, setEditDemon] = useState<Demon | null>(null);
+  const [editFbChallenge, setEditFbChallenge] = useState<FbChallenge | null>(null);
   const [addVictorTo, setAddVictorTo] = useState<{id: number, name: string} | null>(null);
   const [mergeSubmission, setMergeSubmission] = useState<Submission | null>(null);
 
@@ -329,7 +331,10 @@ export default function AdminDashboard() {
                       </td>
                       <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{new Date(ch.added_at).toLocaleDateString('pl-PL')}</td>
                       <td style={{ textAlign: 'right' }}>
-                        <button className="btn-danger" onClick={() => handleFbChallengeDelete(ch.id, ch.name)}>Usuń</button>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                          <button className="btn-secondary" onClick={() => setEditFbChallenge(ch)}>Edytuj</button>
+                          <button className="btn-danger" onClick={() => handleFbChallengeDelete(ch.id, ch.name)}>Usuń</button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -348,6 +353,7 @@ export default function AdminDashboard() {
       {addVictorTo && <AddVictorForm demonId={addVictorTo.id} demonName={addVictorTo.name} onClose={() => { setAddVictorTo(null); loadData(); }} />}
       {mergeSubmission && <MergeSubmissionForm submission={mergeSubmission} onClose={() => { setMergeSubmission(null); loadData(); }} onMergeSuccess={() => { loadData(); }} />}
       {showAddFbChallengeForm && <AddFbChallengeForm onClose={() => { setShowAddFbChallengeForm(false); loadData(); }} />}
+      {editFbChallenge && <EditFbChallengeForm challenge={editFbChallenge} onClose={() => { setEditFbChallenge(null); loadData(); }} />}
     </div>
   );
 }
