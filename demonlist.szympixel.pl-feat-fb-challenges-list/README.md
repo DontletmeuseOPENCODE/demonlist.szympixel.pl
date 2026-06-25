@@ -2,7 +2,7 @@
 
 Prywatna lista najtrudniejszych poziomów typu Demon w grze Geometry Dash, inspirowana serwisem Pointercrate.
 
-## Funkcje
+## Funkcje:
 - 🏆 **Ranking Demonów** - wykaz poziomów z informacjami o twórcy, ID i dowodami wideo.
 - 🎮 **Lista Zwycięzców** - każdy demon posiada listę graczy (victorów), którzy go ukończyli.
 - 🔐 **Panel Administracyjny** - bezpieczny panel do zarządzania listą (dodawanie/edycja demonów i victorów).
