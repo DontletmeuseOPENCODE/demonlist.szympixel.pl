@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import SubmitDemonForm from '@/components/SubmitDemonForm';
+import SubmitVictorForm from '@/components/SubmitVictorForm';
 
 interface NavbarProps {
   user?: { username: string; role: string } | null;
@@ -14,6 +15,7 @@ export default function Navbar({ user }: NavbarProps) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showVictorModal, setShowVictorModal] = useState(false);
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -55,12 +57,20 @@ export default function Navbar({ user }: NavbarProps) {
               </Link>
             ))}
 
-            <button 
-              className="nav-link" 
+            <button
+              className="nav-link"
               style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
               onClick={() => { setMenuOpen(false); setShowSubmitModal(true); }}
             >
               Zgłoś Poziom
+            </button>
+
+            <button
+              className="nav-link"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+              onClick={() => { setMenuOpen(false); setShowVictorModal(true); }}
+            >
+              Zgłoś Victora
             </button>
 
             {user ? (
@@ -81,6 +91,7 @@ export default function Navbar({ user }: NavbarProps) {
         </div>
       </nav>
       {showSubmitModal && <SubmitDemonForm onClose={() => setShowSubmitModal(false)} />}
+      {showVictorModal && <SubmitVictorForm onClose={() => setShowVictorModal(false)} />}
     </>
   );
 }

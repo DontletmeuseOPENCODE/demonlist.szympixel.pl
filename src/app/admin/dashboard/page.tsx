@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { Demon, Submission } from '@/lib/yaml';
 import type { FbChallenge } from '@/lib/fb-challenges';
+import type { VictorSubmission } from '@/lib/victor-submissions';
 import AddDemonForm from '@/components/admin/AddDemonForm';
 import EditDemonForm from '@/components/admin/EditDemonForm';
 import AddVictorForm from '@/components/admin/AddVictorForm';
@@ -15,9 +16,10 @@ export default function AdminDashboard() {
   const [demons, setDemons] = useState<Demon[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [fbChallenges, setFbChallenges] = useState<FbChallenge[]>([]);
+  const [victorSubmissions, setVictorSubmissions] = useState<VictorSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'demons' | 'submissions' | 'fb-challenges'>('demons');
+  const [activeTab, setActiveTab] = useState<'demons' | 'submissions' | 'fb-challenges' | 'victor-submissions'>('demons');
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddFbChallengeForm, setShowAddFbChallengeForm] = useState(false);
@@ -59,9 +61,20 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchVictorSubmissions = async () => {
+    try {
+      const res = await fetch('/api/victor-submissions');
+      if (!res.ok) throw new Error('Błąd pobierania zgłoszeń victorów');
+      const data = await res.json();
+      setVictorSubmissions(data);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   const loadData = async () => {
     setLoading(true);
-    await Promise.all([fetchDemons(), fetchSubmissions(), fetchFbChallenges()]);
+    await Promise.all([fetchDemons(), fetchSubmissions(), fetchFbChallenges(), fetchVictorSubmissions()]);
     setLoading(false);
   };
 
@@ -113,6 +126,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleApproveVictorSubmission = async (id: number) => {
+    if (!confirm('Zatwierdzić to zgłoszenie? Dopisze victora do oficjalnej listy.')) return;
+    try {
+      const res = await fetch(`/api/victor-submissions/${id}/approve`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Błąd zatwierdzania');
+      await loadData();
+    } catch (err: any) {
+      alert(err.message || 'Błąd zatwierdzania');
+    }
+  };
+
+  const handleRejectVictorSubmission = async (id: number, player: string) => {
+    if (!confirm(`Odrzucić zgłoszenie gracza ${player}? Zostanie usunięte.`)) return;
+    try {
+      await fetch(`/api/victor-submissions/${id}`, { method: 'DELETE' });
+      await fetchVictorSubmissions();
+    } catch {
+      alert('Błąd odrzucania zgłoszenia');
+    }
+  };
+
   if (loading) return <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Ładowanie danych...</div>;
   if (error) return <div className="login-error">{error}</div>;
 
@@ -160,6 +195,35 @@ export default function AdminDashboard() {
                 fontWeight: 'bold'
               }}>
                 {submissions.length}
+              </span>
+            )}
+          </button>
+          <button
+            className={`admin-nav-link ${activeTab === 'victor-submissions' ? 'active' : ''}`}
+            style={{
+              background: 'none',
+              border: 'none',
+              width: '100%',
+              textAlign: 'left',
+              cursor: 'pointer',
+              padding: '0.8rem 1rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+            onClick={() => setActiveTab('victor-submissions')}
+          >
+            <span>Zgłoszenia Victorów</span>
+            {victorSubmissions.filter((s) => s.status === 'pending').length > 0 && (
+              <span style={{
+                background: 'var(--accent)',
+                color: 'white',
+                borderRadius: '12px',
+                padding: '0.1rem 0.5rem',
+                fontSize: '0.75rem',
+                fontWeight: 'bold'
+              }}>
+                {victorSubmissions.filter((s) => s.status === 'pending').length}
               </span>
             )}
           </button>
@@ -340,6 +404,103 @@ export default function AdminDashboard() {
                   ))}
                   {fbChallenges.length === 0 && (
                     <tr><td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Brak FB Challenges</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'victor-submissions' && (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h1 className="admin-title" style={{ margin: 0 }}>Zgłoszenia Victorów ({victorSubmissions.filter((s) => s.status === 'pending').length} oczekujących)</h1>
+            </div>
+
+            <div className="card admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Demon</th>
+                    <th>Holder</th>
+                    <th style={{ width: '80px' }}>Progress</th>
+                    <th>Video</th>
+                    <th>Raw Footage</th>
+                    <th>Notatka</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: 'right' }}>Akcje</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {victorSubmissions.map(sub => {
+                    const demon = demons.find((d) => d.id === sub.demon_id);
+                    const alreadyVictor = demon?.victors?.some((v) => v.player.toLowerCase() === sub.player.toLowerCase());
+                    return (
+                      <tr key={sub.id}>
+                        <td>
+                          <strong>{demon ? demon.name : `#${sub.demon_id} (usunięty)`}</strong>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                            {demon ? `#${demon.rank}` : ''}
+                          </div>
+                        </td>
+                        <td>
+                          <strong>{sub.player}</strong>
+                          {alreadyVictor && (
+                            <div style={{ fontSize: '0.7rem', color: '#ff9800', marginTop: '0.2rem' }}>⚠ już na liście</div>
+                          )}
+                        </td>
+                        <td><strong style={{ color: 'var(--accent)' }}>{sub.progress}%</strong></td>
+                        <td>
+                          <a href={sub.video} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontSize: '0.85rem' }}>
+                            ▶ YT
+                          </a>
+                        </td>
+                        <td>
+                          <a href={sub.raw_footage} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', fontSize: '0.85rem' }}>
+                            ▶ link
+                          </a>
+                        </td>
+                        <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={sub.notes}>
+                          {sub.notes || <span style={{ color: 'var(--text-dim)' }}>—</span>}
+                        </td>
+                        <td>
+                          {sub.status === 'pending' && <span style={{ color: 'var(--accent)', fontSize: '0.8rem' }}>● oczekuje</span>}
+                          {sub.status === 'approved' && <span style={{ color: '#4caf50', fontSize: '0.8rem' }}>✓ zatwierdzony</span>}
+                          {sub.status === 'rejected' && <span style={{ color: '#ff4b4b', fontSize: '0.8rem' }}>✗ odrzucony</span>}
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          {sub.status === 'pending' ? (
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                              <button
+                                className="btn-primary"
+                                style={{ background: '#4caf50', borderColor: '#4caf50', padding: '0.3rem 0.7rem', fontSize: '0.85rem' }}
+                                onClick={() => handleApproveVictorSubmission(sub.id)}
+                              >
+                                Zatwierdź
+                              </button>
+                              <button
+                                className="btn-danger"
+                                style={{ padding: '0.3rem 0.7rem', fontSize: '0.85rem' }}
+                                onClick={() => handleRejectVictorSubmission(sub.id, sub.player)}
+                              >
+                                Odrzuć
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              className="btn-secondary"
+                              style={{ padding: '0.3rem 0.7rem', fontSize: '0.8rem' }}
+                              onClick={() => handleRejectVictorSubmission(sub.id, sub.player)}
+                            >
+                              Usuń z listy
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {victorSubmissions.length === 0 && (
+                    <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Brak zgłoszeń</td></tr>
                   )}
                 </tbody>
               </table>
