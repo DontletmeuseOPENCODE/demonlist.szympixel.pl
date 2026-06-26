@@ -1,29 +1,92 @@
-- id: 1
-  name: Blue World
-  creator: PINE
-  level_id: 0
-  video: https://www.youtube.com/watch?v=JkVeHaXgk5E
-  thumbnail: https://img.youtube.com/vi/JkVeHaXgk5E/hqdefault.jpg
+- id: 2
+  name: Society
+  creator: ⁨Neomarbilan⁩
+  level_id: 127323087
+  video: https://www.youtube.com/watch?v=3CoEaH1CM7o
+  thumbnail: https://img.youtube.com/vi/3CoEaH1CM7o/hqdefault.jpg
   rank: 1
-  added_at: "2026-05-29"
-  level_password: ""
-  level_length: ""
-  object_count: 0
-  difficulty: ""
-  gd_version: ""
-  song_name: ""
-  song_author: ""
-  song_id: 0
-  song_url: ""
+  added_at: "2026-06-25"
   victors:
-    - player: FriskieBOI
-      link: https://www.youtube.com/watch?v=JkVeHaXgk5E
-      date: "2026-05-24"
-    - player: FriskieBOI
+    - player: wPopoff
       link: ""
-      date: "2026-06-04"
-      isVerifier: true
-    - player: NewHolderPL
-      link: https://www.youtube.com/watch?v=dQw4w9WgXcQ
       date: "2026-06-25"
+      isVerifier: true
+  level_password: Free Copy
+  level_length: 2m:12s
+  object_count: 168368
+  difficulty: Extreme Demon
+  gd_version: "2.2"
+  song_name: Pathetic - Society (Remix)
+  song_author: HeliiXScream
+  song_id: 1569886
+  song_url: https://www.newgrounds.com/audio/listen/1569886
+- id: 3
+  name: Heliopolis
+  creator: Mindcap
+  level_id: 136530685
+  video: https://www.youtube.com/watch?v=7yaKGl_2Dsw
+  thumbnail: https://img.youtube.com/vi/7yaKGl_2Dsw/hqdefault.jpg
+  rank: 2
+  added_at: "2026-06-25"
+  victors:
+    - player: Zoink (potential verifier. holds a WR that he has the level in 2 runs)
+      link: https://www.youtube.com/watch?v=HEG_SrCyfaU
+      date: "2026-12-06"
+      isVerifier: true
+  level_password: Free Copy
+  level_length: 2m19s
+  object_count: 128000
+  difficulty: Insane (unrated)
+  gd_version: 2.1\2.2
+  song_name: Apoplexy
+  song_author: Bee Hunter
+  song_id: 1546698
+  song_url: https://www.newgrounds.com/audio/listen/1546698
+- id: 4
+  name: Amethyst
+  creator: iMist
+  level_id: 119550490
+  video: https://www.youtube.com/watch?v=4lfkzz1VCbA
+  thumbnail: https://img.youtube.com/vi/4lfkzz1VCbA/hqdefault.jpg
+  rank: 3
+  added_at: "2026-06-26"
+  victors:
+    - player: wPopoff
+      link: ""
+      date: "2025-05-25"
+      isVerifier: true
+  level_password: Free Copy
+  level_length: 1m:42s
+  object_count: 147423
+  difficulty: Extreme Demon (epic)
+  gd_version: "2.2"
+  song_name: Ricochet Love
+  song_author: Waterflame
+  song_id: 233860
+  song_url: https://www.newgrounds.com/audio/listen/233860
+- id: 5
+  name: Thinking Space II
+  creator: CarioX
+  level_id: 119544028
+  video: https://www.youtube.com/watch?v=CELNmHwln_c
+  thumbnail: https://img.youtube.com/vi/CELNmHwln_c/hqdefault.jpg
+  rank: 4
+  added_at: "2026-06-26"
+  victors:
+    - player: Zoink
+      link: ""
+      date: "2025-05-24"
+      isVerifier: true
+    - player: Netermind
+      link: https://www.youtube.com/watch?v=uqHsCNJxqmY
+      date: "2026-06-26"
       isVerifier: false
+  level_password: Free Copy
+  level_length: 1m:07s
+  object_count: 139568
+  difficulty: Extreme Demon (epic)
+  gd_version: "2.2"
+  song_name: Nuke Powder
+  song_author: Maeloux
+  song_id: 489111
+  song_url: https://www.newgrounds.com/audio/listen/489111
