@@ -148,6 +148,25 @@ export function deleteVictor(demonId: number, playerName: string): Demon | null 
 }
 
 /**
+ * Usuwa WSZYSTKIE wpisy victora (completed + verified) dla danego gracza
+ * ze wszystkich demonów. Case-insensitive match. Zwraca liczbę usuniętych wpisów.
+ * Nie modyfikuje `creator` ani niczego innego — tylko tablicę `victors`.
+ */
+export function banPlayer(playerName: string): number {
+  const target = (playerName || '').toLowerCase();
+  if (!target) return 0;
+  const demons = readDemons();
+  let removed = 0;
+  for (const d of demons) {
+    const before = d.victors.length;
+    d.victors = d.victors.filter((v) => (v.player || '').toLowerCase() !== target);
+    removed += before - d.victors.length;
+  }
+  if (removed > 0) writeDemons(demons);
+  return removed;
+}
+
+/**
  * Aktualizuje pojedynczego victora w demonie (player jest kluczem).
  * Wszystkie pola są opcjonalne; puste / null = nie zmieniaj.
  */

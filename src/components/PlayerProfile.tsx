@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { PlayerStats, CompletedDemonEntry, VerifiedDemonEntry, CreatedDemonEntry } from '@/lib/stats';
+import BanPlayerButton from '@/components/BanPlayerButton';
 
 interface Props {
   stats: PlayerStats;
@@ -91,7 +92,12 @@ export default function PlayerProfile({ stats, isAdmin }: Props) {
 
       <div className="stats-header">
         <h1 className="stats-player-name">{stats.player}</h1>
-        {isAdmin && <span className="stats-admin-badge">admin mode</span>}
+        {isAdmin && (
+          <>
+            <span className="stats-admin-badge">admin mode</span>
+            <BanPlayerButton player={stats.player} />
+          </>
+        )}
       </div>
 
       <div className="stats-metrics">
