@@ -477,7 +477,20 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   min-width: 2rem;
 }
 
-.victor-name { font-weight: 500; flex: 1; padding: 0 1rem; }
+.victor-name { font-weight: 500; flex: 1; padding: 0 1rem; display: flex; align-items: center; gap: 0.6rem; }
+
+.victor-progress-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.02em;
+  background: rgba(233, 69, 96, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(233, 69, 96, 0.35);
+}
 
 .victor-link {
   color: var(--accent);

@@ -17,7 +17,17 @@ export default function VictorList({ victors }: { victors: Victor[] }) {
       {sortedVictors.map((v, i) => (
         <div key={i} className="victor-item">
           <div className="victor-position">#{i + 1}</div>
-          <div className="victor-name">{v.player}</div>
+          <div className="victor-name">
+            {v.player}
+            {typeof v.progress === 'number' && (
+              <span
+                className="victor-progress-badge"
+                title={`Progress: ${v.progress}%`}
+              >
+                {v.progress}%
+              </span>
+            )}
+          </div>
           {v.link && (
             <a href={v.link} target="_blank" rel="noopener noreferrer" className="victor-link">
               Dowód wideo

@@ -7,6 +7,8 @@ export interface Victor {
   link: string;
   date: string;
   isVerifier?: boolean;
+  // Progress w % (80-100). Opcjonalny — weryfikatorzy i starsi victorzy mogą go nie mieć.
+  progress?: number;
 }
 
 export interface Demon {

@@ -36,6 +36,7 @@ export async function POST(_request: Request, { params }: Params) {
       link: sub.video,
       date: sub.submitted_at,
       isVerifier: false,
+      progress: sub.progress,
     });
 
     const updated = updateVictorSubmissionStatus(subId, 'approved');

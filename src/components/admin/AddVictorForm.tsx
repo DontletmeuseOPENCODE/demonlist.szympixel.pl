@@ -12,6 +12,7 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
     player: '',
     link: '',
     date: new Date().toISOString().split('T')[0],
+    progress: '',
     isVerifier: false
   });
 
@@ -34,7 +35,8 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           demon_id: demonId,
-          ...formData
+          ...formData,
+          progress: formData.progress ? Number(formData.progress) : undefined,
         }),
       });
 
@@ -82,6 +84,22 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
           <div className="form-group">
             <label>{formData.isVerifier ? 'Data weryfikacji' : 'Data ukończenia'}</label>
             <input type="date" name="date" value={formData.date} onChange={handleChange} required />
+          </div>
+          <div className="form-group">
+            <label>Progress % (opcjonalne)</label>
+            <input
+              type="number"
+              name="progress"
+              value={formData.progress}
+              onChange={handleChange}
+              min="80"
+              max="100"
+              step="0.01"
+              placeholder="np. 100 (zostaw puste jeśli brak)"
+            />
+            <small style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>
+              Tylko dla zwycięzców — weryfikatorzy mają zawsze 100%.
+            </small>
           </div>
           
           <div className="modal-actions">
