@@ -53,6 +53,14 @@ export interface PlayerStats {
   demons_completed: CompletedDemonEntry[];
   demons_verified: VerifiedDemonEntry[];
   demons_created: CreatedDemonEntry[];
+  /** Mapa nazw pól na `true` gdy wartość jest ręcznie nadpisana w stats-overrides.yml. */
+  _override?: {
+    main_completed?: boolean;
+    verified_count?: boolean;
+    created_count?: boolean;
+    score?: boolean;
+    hardest_demon?: boolean;
+  };
 }
 
 export interface LeaderboardEntry {
@@ -61,6 +69,11 @@ export interface LeaderboardEntry {
   rank: number;
   main_completed: number;
   verified_count: number;
+  _override?: {
+    main_completed?: boolean;
+    verified_count?: boolean;
+    score?: boolean;
+  };
 }
 
 function thumbnailFor(video: string, fallback: string): string {
@@ -195,36 +208,118 @@ export function getPlayerStats(name: string): PlayerStats {
 }
 
 /**
- * Leaderboard — wszyscy gracze posortowani po score malejąco.
+ * Łączy obliczone statystyki z ewentualnym ręcznym nadpisaniem.
+ * Nadpisane pola oznacza przez `_override[field] = true`.
+ * `hardest_demon_id === null` w override = wymuś "brak" (nie obliczaj).
+ */
+export function getEffectiveStats(name: string): PlayerStats {
+  const computed = getPlayerStats(name);
+  // Lazy import — unikamy cyklu zależności
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { getStatsOverride } = require('./stats-overrides') as typeof import('./stats-overrides');
+  const ov = getStatsOverride(name);
+  if (!ov) return computed;
+
+  const demons = readDemons();
+  const overrideFlags: NonNullable<PlayerStats['_override']> = {};
+  const merged: PlayerStats = { ...computed };
+
+  if (ov.main_completed !== undefined) {
+    merged.main_completed = ov.main_completed;
+    overrideFlags.main_completed = true;
+  }
+  if (ov.verified_count !== undefined) {
+    merged.verified_count = ov.verified_count;
+    overrideFlags.verified_count = true;
+  }
+  if (ov.created_count !== undefined) {
+    merged.created_count = ov.created_count;
+    overrideFlags.created_count = true;
+  }
+  if (ov.score !== undefined) {
+    merged.score = ov.score;
+    overrideFlags.score = true;
+  }
+  if (ov.hardest_demon_id !== undefined) {
+    if (ov.hardest_demon_id === null) {
+      merged.hardest_demon = undefined;
+    } else {
+      const d = demons.find((x) => x.id === ov.hardest_demon_id);
+      merged.hardest_demon = d
+        ? {
+            id: d.id,
+            name: d.name,
+            rank: d.rank,
+            creator: d.creator,
+            thumbnail: thumbnailFor(d.video, d.thumbnail),
+          }
+        : undefined;
+    }
+    overrideFlags.hardest_demon = true;
+  }
+
+  if (Object.keys(overrideFlags).length > 0) {
+    merged._override = overrideFlags;
+  }
+  return merged;
+}
+
+/**
+ * Leaderboard — wszyscy gracze posortowani po effective score malejąco.
+ * Używa `getEffectiveStats` per gracz, więc honoruje ręczne nadpisania.
  */
 export function getDemonlistLeaderboard(): LeaderboardEntry[] {
-  const demons = readDemons();
-  const playerMap = new Map<string, { score: number; main: number; verified: number; display: string }>();
+  const leaderboardMap = new Map<string, LeaderboardEntry>();
 
-  for (const d of demons) {
+  for (const d of readDemons()) {
     for (const v of d.victors || []) {
       const key = (v.player || '').toLowerCase();
       if (!key) continue;
-      if (!playerMap.has(key)) {
-        playerMap.set(key, { score: 0, main: 0, verified: 0, display: v.player });
+      if (!leaderboardMap.has(key)) {
+        leaderboardMap.set(key, {
+          player: v.player,
+          score: 0,
+          main_completed: 0,
+          verified_count: 0,
+          rank: 0,
+          _override: { score: false, main_completed: false, verified_count: false },
+        });
       }
-      const entry = playerMap.get(key)!;
-      if (v.isVerifier) {
-        entry.verified += 1;
-      } else {
-        entry.main += 1;
-        entry.score += 100 * (1 - (d.rank - 1) / 100);
+      const e = leaderboardMap.get(key)!;
+      if (v.isVerifier) e.verified_count += 1;
+      else {
+        e.main_completed += 1;
+        e.score += 100 * (1 - (d.rank - 1) / 100);
       }
     }
   }
 
-  const arr = Array.from(playerMap.entries()).map(([key, e]) => ({
-    player: e.display,
-    score: e.score,
-    main_completed: e.main,
-    verified_count: e.verified,
-    rank: 0,
+  const arr: LeaderboardEntry[] = Array.from(leaderboardMap.values()).map((e) => ({
+    ...e,
+    _override: { ...(e._override ?? {}) },
   }));
+  // Zastosuj nadpisania do score i counts
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { readStatsOverrides } = require('./stats-overrides') as typeof import('./stats-overrides');
+  const all = readStatsOverrides();
+  for (const ov of all) {
+    const key = (ov.player || '').toLowerCase();
+    const entry = arr.find((e) => e.player.toLowerCase() === key);
+    if (!entry) continue;
+    if (!entry._override) entry._override = {};
+    if (ov.score !== undefined) {
+      entry.score = ov.score;
+      entry._override.score = true;
+    }
+    if (ov.main_completed !== undefined) {
+      entry.main_completed = ov.main_completed;
+      entry._override.main_completed = true;
+    }
+    if (ov.verified_count !== undefined) {
+      entry.verified_count = ov.verified_count;
+      entry._override.verified_count = true;
+    }
+  }
   arr.sort((a, b) => b.score - a.score);
   arr.forEach((e, i) => (e.rank = i + 1));
   return arr;

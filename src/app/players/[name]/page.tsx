@@ -1,4 +1,4 @@
-import { getPlayerStats } from '@/lib/stats';
+import { getEffectiveStats } from '@/lib/stats';
 import PlayerProfile from '@/components/PlayerProfile';
 import { getSession } from '@/lib/session';
 import { notFound } from 'next/navigation';
@@ -10,7 +10,7 @@ interface Params {
 export default async function PlayerPage({ params }: Params) {
   const { name } = await params;
   const decoded = decodeURIComponent(name);
-  const stats = getPlayerStats(decoded);
+  const stats = getEffectiveStats(decoded);
   const session = await getSession();
   // isAdmin do warunkowania drag handle / edit / delete w PlayerProfile
   const isAdmin = !!(session?.isLoggedIn && session.role === 'admin');
