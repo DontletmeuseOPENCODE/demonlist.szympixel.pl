@@ -3,6 +3,7 @@ import { getNewgroundsSongUrl } from '@/lib/youtube';
 import { notFound } from 'next/navigation';
 import VictorList from '@/components/VictorList';
 import Link from 'next/link';
+import { getSession } from '@/lib/session';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -15,6 +16,9 @@ export default async function DemonPage({ params }: Params) {
   if (!demon) {
     notFound();
   }
+
+  const session = await getSession();
+  const isAdmin = !!(session?.isLoggedIn && session.role === 'admin');
 
   // Używamy miniatury YT w wyższej jakości, jeśli video to link z youtube
   let hdThumbnail = demon.thumbnail;
@@ -131,7 +135,7 @@ export default async function DemonPage({ params }: Params) {
       )}
 
       <h2 className="section-title">Lista Zwycięzców ({actualVictorsCount})</h2>
-      <VictorList victors={demon.victors || []} />
+      <VictorList victors={demon.victors || []} demonId={demon.id} isAdmin={isAdmin} />
     </div>
   );
 }

@@ -147,6 +147,59 @@ export function deleteVictor(demonId: number, playerName: string): Demon | null 
   return demon;
 }
 
+/**
+ * Aktualizuje pojedynczego victora w demonie (player jest kluczem).
+ * Wszystkie pola są opcjonalne; puste / null = nie zmieniaj.
+ */
+export function updateVictor(
+  demonId: number,
+  playerName: string,
+  updates: { link?: string; date?: string; isVerifier?: boolean; progress?: number | null }
+): { demon: Demon; victor: Victor } | null {
+  const demons = readDemons();
+  const demon = demons.find((d) => d.id === demonId);
+  if (!demon) return null;
+  const idx = demon.victors.findIndex((v) => v.player === playerName);
+  if (idx === -1) return null;
+  const v = demon.victors[idx];
+  if (updates.link !== undefined) v.link = updates.link;
+  if (updates.date !== undefined) v.date = updates.date;
+  if (updates.isVerifier !== undefined) v.isVerifier = updates.isVerifier;
+  if (updates.progress === null) {
+    delete v.progress;
+  } else if (updates.progress !== undefined) {
+    v.progress = updates.progress;
+  }
+  writeDemons(demons);
+  return { demon, victor: v };
+}
+
+/**
+ * Przepisuje `rank` demonów według nowej kolejności id.
+ * `order[0]` = id demona, który dostanie rank=1, itd.
+ * Zachowuje wszystkie inne pola.
+ */
+export function reorderDemons(order: number[]): Demon[] {
+  const demons = readDemons();
+  const byId = new Map(demons.map((d) => [d.id, d]));
+  const seen = new Set<number>();
+  const next: Demon[] = [];
+  order.forEach((id, idx) => {
+    const d = byId.get(id);
+    if (!d) return;
+    seen.add(id);
+    next.push({ ...d, rank: idx + 1 });
+  });
+  // Dorzuć demony spoza `order` na końcu (zachowaj obecne ranki powyżej)
+  for (const d of demons) {
+    if (!seen.has(d.id)) {
+      next.push({ ...d, rank: next.length + 1 });
+    }
+  }
+  writeDemons(next);
+  return next;
+}
+
 export function readSubmissions(): Submission[] {
   if (!fs.existsSync(SUBMISSIONS_PATH)) {
     return [];
