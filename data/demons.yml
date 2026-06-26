@@ -28,11 +28,6 @@
   thumbnail: https://img.youtube.com/vi/7yaKGl_2Dsw/hqdefault.jpg
   rank: 2
   added_at: "2026-06-25"
-  victors:
-    - player: Zoink (potential verifier. holds a WR that he has the level in 2 runs)
-      link: https://www.youtube.com/watch?v=HEG_SrCyfaU
-      date: "2026-12-06"
-      isVerifier: true
   level_password: Free Copy
   level_length: 2m19s
   object_count: 128000
@@ -42,6 +37,7 @@
   song_author: Bee Hunter
   song_id: 1546698
   song_url: https://www.newgrounds.com/audio/listen/1546698
+  victors: []
 - id: 3
   name: Amethyst
   creator: iMist
@@ -55,6 +51,12 @@
       link: ""
       date: "2025-05-25"
       isVerifier: true
+    - player: Zoink
+      link: https://www.youtube.com/watch?v=x3Sof3yGJ5Y
+      date: "2026-06-26"
+      isVerifier: false
+      is_potential: false
+      progress: 100
   level_password: Free Copy
   level_length: 1m:42s
   object_count: 147423
@@ -73,10 +75,6 @@
   rank: 4
   added_at: "2026-06-26"
   victors:
-    - player: Zoink
-      link: ""
-      date: "2025-05-24"
-      isVerifier: true
     - player: Netermind
       link: https://www.youtube.com/watch?v=uqHsCNJxqmY
       date: "2026-06-26"
@@ -104,11 +102,6 @@
       link: ""
       date: "2025-09-21"
       isVerifier: true
-    - player: Zoink
-      link: https://www.youtube.com/watch?v=2Pr3R_pc8Vw
-      date: "2026-06-26"
-      isVerifier: false
-      progress: 100
     - player: zLevii
       link: https://www.youtube.com/watch?v=LCd1aljMPWs
       date: "2026-06-26"

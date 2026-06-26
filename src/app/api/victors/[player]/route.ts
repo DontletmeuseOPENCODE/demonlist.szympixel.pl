@@ -27,14 +27,14 @@ export async function DELETE(request: Request, { params }: Params) {
 
 /**
  * PATCH /api/victors/[player]
- * Body: { demon_id, link?, date?, isVerifier?, progress? | progress: null }
+ * Body: { demon_id, link?, date?, isVerifier?, progress? | progress: null, is_potential? | is_potential: null }
  * Aktualizuje istniejącego victora. Wymaga admina lub moderatora (POST ma takie same wymogi).
  */
 export async function PATCH(request: Request, { params }: Params) {
   try {
     const { player } = await params;
     const body = await request.json();
-    const { demon_id, link, date, isVerifier, progress } = body;
+    const { demon_id, link, date, isVerifier, progress, is_potential } = body;
 
     if (!demon_id) {
       return NextResponse.json({ error: 'Brakuje demon_id' }, { status: 400 });
@@ -52,6 +52,11 @@ export async function PATCH(request: Request, { params }: Params) {
       progressUpdate = num;
     }
 
+    // is_potential: null = usuń pole, undefined = nie ruszaj, true/false = ustaw
+    let isPotentialUpdate: boolean | null | undefined = undefined;
+    if (is_potential === null) isPotentialUpdate = null;
+    else if (is_potential !== undefined) isPotentialUpdate = !!is_potential;
+
     const result = updateVictor(
       Number(demon_id),
       decodeURIComponent(player),
@@ -60,6 +65,7 @@ export async function PATCH(request: Request, { params }: Params) {
         date,
         isVerifier,
         progress: progressUpdate,
+        is_potential: isPotentialUpdate,
       }
     );
 

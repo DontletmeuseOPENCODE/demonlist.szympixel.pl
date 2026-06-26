@@ -92,6 +92,8 @@ function completedFromMain(demons: Demon[], playerLower: string): { entries: Com
     for (const v of d.victors || []) {
       if ((v.player || '').toLowerCase() !== playerLower) continue;
       if (v.isVerifier) {
+        // Potential verifier: liczy się do verified_count (to nie jest "ukonczenie gracza"),
+        // ale pomijamy w score/main/hardest (są obsłużone niżej w else).
         verifiedCount += 1;
         verified.push({
           id: d.id,
@@ -102,7 +104,8 @@ function completedFromMain(demons: Demon[], playerLower: string): { entries: Com
           video: d.video,
           date: v.date,
         });
-      } else {
+      } else if (!v.is_potential) {
+        // Potential victor: NIE liczy się do stats (score, main, hardest).
         mainCount += 1;
         score += 100 * (1 - (d.rank - 1) / 100);
         entries.push({
@@ -287,7 +290,7 @@ export function getDemonlistLeaderboard(): LeaderboardEntry[] {
       }
       const e = leaderboardMap.get(key)!;
       if (v.isVerifier) e.verified_count += 1;
-      else {
+      else if (!v.is_potential) {
         e.main_completed += 1;
         e.score += 100 * (1 - (d.rank - 1) / 100);
       }

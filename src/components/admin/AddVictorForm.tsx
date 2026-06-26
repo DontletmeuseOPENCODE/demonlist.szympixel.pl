@@ -13,7 +13,8 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
     link: '',
     date: new Date().toISOString().split('T')[0],
     progress: '',
-    isVerifier: false
+    isVerifier: false,
+    is_potential: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,15 +63,29 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
         
         <form onSubmit={handleSubmit}>
           <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               id="isVerifier"
-              name="isVerifier" 
-              checked={formData.isVerifier} 
-              onChange={handleChange} 
+              name="isVerifier"
+              checked={formData.isVerifier}
+              onChange={handleChange}
               style={{ width: 'auto', cursor: 'pointer' }}
             />
             <label htmlFor="isVerifier" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>Weryfikator?</label>
+          </div>
+
+          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+            <input
+              type="checkbox"
+              id="is_potential"
+              name="is_potential"
+              checked={formData.is_potential}
+              onChange={handleChange}
+              style={{ width: 'auto', cursor: 'pointer' }}
+            />
+            <label htmlFor="is_potential" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>
+              Potential victor (nie licz do stats)
+            </label>
           </div>
 
           <div className="form-group">

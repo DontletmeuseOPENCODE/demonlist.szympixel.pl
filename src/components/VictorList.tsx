@@ -37,6 +37,11 @@ export default function VictorList({ victors, demonId, isAdmin }: Props) {
               >
                 {v.player}
               </Link>
+              {v.is_potential && (
+                <span className="victor-progress-badge" style={{ background: 'var(--text-dim)', color: 'var(--bg-primary)' }} title="Potential — nie liczy się do statystyk">
+                  potential
+                </span>
+              )}
               {typeof v.progress === 'number' && (
                 <span
                   className="victor-progress-badge"

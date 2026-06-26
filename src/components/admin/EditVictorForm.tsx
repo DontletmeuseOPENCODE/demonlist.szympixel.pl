@@ -24,6 +24,7 @@ export default function EditVictorForm({ demonId, victor, onClose }: Props) {
     date: victor.date || new Date().toISOString().split('T')[0],
     progress: victor.progress !== undefined ? String(victor.progress) : '',
     isVerifier: !!victor.isVerifier,
+    is_potential: !!victor.is_potential,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +46,7 @@ export default function EditVictorForm({ demonId, victor, onClose }: Props) {
         link: formData.link,
         date: formData.date,
         isVerifier: formData.isVerifier,
+        is_potential: formData.is_potential,
       };
       if (formData.progress === '') {
         body.progress = null;
@@ -111,6 +113,20 @@ export default function EditVictorForm({ demonId, victor, onClose }: Props) {
               style={{ width: 'auto', cursor: 'pointer' }}
             />
             <label htmlFor="edit-isVerifier" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>Weryfikator?</label>
+          </div>
+
+          <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+            <input
+              type="checkbox"
+              id="edit-is_potential"
+              name="is_potential"
+              checked={formData.is_potential}
+              onChange={handleChange}
+              style={{ width: 'auto', cursor: 'pointer' }}
+            />
+            <label htmlFor="edit-is_potential" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>
+              Potential victor (nie licz do stats)
+            </label>
           </div>
 
           <div className="form-group">

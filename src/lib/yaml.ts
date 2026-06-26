@@ -7,6 +7,10 @@ export interface Victor {
   link: string;
   date: string;
   isVerifier?: boolean;
+  // Potential = wpis istnieje, ale nie liczy się do stats gracza
+  // (score / main_completed / hardest). Używane dla nie-graczy trzymających WR-y,
+  // kontrowersyjnych zgłoszeń itp. Verified count nadal liczy jeśli też isVerifier.
+  is_potential?: boolean;
   // Progress w % (80-100). Opcjonalny — weryfikatorzy i starsi victorzy mogą go nie mieć.
   progress?: number;
 }
@@ -60,8 +64,11 @@ const SUBMISSIONS_PATH = path.join(process.cwd(), 'data', 'submissions.yml');
 
 export function readDemons(): Demon[] {
   const raw = fs.readFileSync(DEMONS_PATH, 'utf8');
-  const data = yaml.load(raw) as Demon[];
-  return (data || []).sort((a, b) => a.rank - b.rank);
+  const data = (yaml.load(raw) as Demon[] | null) || [];
+  // Defensywnie: stare wpisy mogą nie mieć pola victors (np. po banie ostatniego gracza).
+  return data
+    .map((d) => ({ ...d, victors: d.victors || [] }))
+    .sort((a, b) => a.rank - b.rank);
 }
 
 export function writeDemons(demons: Demon[]): void {
@@ -173,7 +180,7 @@ export function banPlayer(playerName: string): number {
 export function updateVictor(
   demonId: number,
   playerName: string,
-  updates: { link?: string; date?: string; isVerifier?: boolean; progress?: number | null }
+  updates: { link?: string; date?: string; isVerifier?: boolean; progress?: number | null; is_potential?: boolean | null }
 ): { demon: Demon; victor: Victor } | null {
   const demons = readDemons();
   const demon = demons.find((d) => d.id === demonId);
@@ -184,6 +191,11 @@ export function updateVictor(
   if (updates.link !== undefined) v.link = updates.link;
   if (updates.date !== undefined) v.date = updates.date;
   if (updates.isVerifier !== undefined) v.isVerifier = updates.isVerifier;
+  if (updates.is_potential === null) {
+    delete v.is_potential;
+  } else if (updates.is_potential !== undefined) {
+    v.is_potential = updates.is_potential;
+  }
   if (updates.progress === null) {
     delete v.progress;
   } else if (updates.progress !== undefined) {
