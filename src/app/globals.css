@@ -752,6 +752,29 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .stats-leaderboard-row { grid-template-columns: 2.5rem 1fr 5rem; }
   .stats-leaderboard-meta { display: none; }
   .stats-player-name { font-size: 2rem; }
+  .drag-row { box-shadow: none !important; }
+}
+
+.stats-override-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  font-family: 'Inter', sans-serif;
+}
+.stats-override-badge.auto {
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid var(--border);
+}
+.stats-override-badge.override {
+  color: white;
+  background: var(--accent);
 }
 
 /* ─── Drag Handle / Reorder ─── */

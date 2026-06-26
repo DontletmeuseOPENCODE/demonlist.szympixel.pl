@@ -11,6 +11,7 @@ import MergeSubmissionForm from '@/components/admin/MergeSubmissionForm';
 import AddFbChallengeForm from '@/components/admin/AddFbChallengeForm';
 import EditFbChallengeForm from '@/components/admin/EditFbChallengeForm';
 import DemonDragList from '@/components/admin/DemonDragList';
+import StatsTab from './StatsTab';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
@@ -20,7 +21,7 @@ export default function AdminDashboard() {
   const [victorSubmissions, setVictorSubmissions] = useState<VictorSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'demons' | 'submissions' | 'fb-challenges' | 'victor-submissions'>('demons');
+  const [activeTab, setActiveTab] = useState<'demons' | 'submissions' | 'fb-challenges' | 'victor-submissions' | 'stats'>('demons');
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddFbChallengeForm, setShowAddFbChallengeForm] = useState(false);
@@ -227,6 +228,13 @@ export default function AdminDashboard() {
                 {victorSubmissions.filter((s) => s.status === 'pending').length}
               </span>
             )}
+          </button>
+          <button
+            className={`admin-nav-link ${activeTab === 'stats' ? 'active' : ''}`}
+            style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', padding: '0.8rem 1rem', display: 'block' }}
+            onClick={() => setActiveTab('stats')}
+          >
+            Stats
           </button>
           <Link href="/admin/users" className="admin-nav-link">Użytkownicy (Admin)</Link>
         </nav>
@@ -501,6 +509,10 @@ export default function AdminDashboard() {
               </table>
             </div>
           </>
+        )}
+
+        {activeTab === 'stats' && (
+          <StatsTab />
         )}
       </div>
 
