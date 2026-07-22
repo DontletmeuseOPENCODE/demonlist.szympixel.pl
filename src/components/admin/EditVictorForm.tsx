@@ -2,26 +2,36 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import type { Victor } from '@/lib/yaml';
 
-export default function AddVictorForm({ demonId, demonName, onClose }: { demonId: number, demonName: string, onClose: () => void }) {
+interface Props {
+  demonId: number;
+  victor: Victor;
+  onClose: () => void;
+}
+
+/**
+ * Modal edycji istniejącego victora.
+ * Player name jest readonly (to klucz w demon.victors[]).
+ */
+export default function EditVictorForm({ demonId, victor, onClose }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [formData, setFormData] = useState({
-    player: '',
-    link: '',
-    date: new Date().toISOString().split('T')[0],
-    progress: '',
-    isVerifier: false,
-    is_potential: false,
+    link: victor.link || '',
+    date: victor.date || new Date().toISOString().split('T')[0],
+    progress: victor.progress !== undefined ? String(victor.progress) : '',
+    isVerifier: !!victor.isVerifier,
+    is_potential: !!victor.is_potential,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData({ 
-      ...formData, 
-      [name]: type === 'checkbox' ? checked : value 
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
@@ -31,14 +41,23 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
     setError('');
 
     try {
-      const res = await fetch('/api/victors', {
-        method: 'POST',
+      const body: Record<string, unknown> = {
+        demon_id: demonId,
+        link: formData.link,
+        date: formData.date,
+        isVerifier: formData.isVerifier,
+        is_potential: formData.is_potential,
+      };
+      if (formData.progress === '') {
+        body.progress = null;
+      } else {
+        body.progress = Number(formData.progress);
+      }
+
+      const res = await fetch(`/api/victors/${encodeURIComponent(victor.player)}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          demon_id: demonId,
-          ...formData,
-          progress: formData.progress ? Number(formData.progress) : undefined,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -54,44 +73,62 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
     }
   };
 
+  const handleDelete = async () => {
+    if (!confirm(`Usunąć wpis dla gracza "${victor.player}"?`)) return;
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`/api/victors/${encodeURIComponent(victor.player)}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ demon_id: demonId }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Wystąpił błąd');
+      }
+      router.refresh();
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal">
-        <h2 className="modal-title">Dodaj Zwycięzcę do: {demonName}</h2>
-        
+        <h2 className="modal-title">Edytuj victora: {victor.player}</h2>
+
         {error && <div className="login-error">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <input
               type="checkbox"
-              id="isVerifier"
+              id="edit-isVerifier"
               name="isVerifier"
               checked={formData.isVerifier}
               onChange={handleChange}
               style={{ width: 'auto', cursor: 'pointer' }}
             />
-            <label htmlFor="isVerifier" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>Weryfikator?</label>
+            <label htmlFor="edit-isVerifier" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>Weryfikator?</label>
           </div>
 
           <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
             <input
               type="checkbox"
-              id="is_potential"
+              id="edit-is_potential"
               name="is_potential"
               checked={formData.is_potential}
               onChange={handleChange}
               style={{ width: 'auto', cursor: 'pointer' }}
             />
-            <label htmlFor="is_potential" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>
+            <label htmlFor="edit-is_potential" style={{ margin: 0, cursor: 'pointer', fontWeight: 'bold' }}>
               Potential victor (nie licz do stats)
             </label>
           </div>
 
-          <div className="form-group">
-            <label>Gracz</label>
-            <input type="text" name="player" value={formData.player} onChange={handleChange} required placeholder="Nick gracza" />
-          </div>
           <div className="form-group">
             <label>Dowód (Link do YouTube){formData.isVerifier ? ' (Opcjonalny)' : ''}</label>
             <input type="url" name="link" value={formData.link} onChange={handleChange} required={!formData.isVerifier} />
@@ -101,7 +138,7 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
             <input type="date" name="date" value={formData.date} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label>Progress % (opcjonalne)</label>
+            <label>Progress % (zostaw puste, aby usunąć)</label>
             <input
               type="number"
               name="progress"
@@ -110,16 +147,16 @@ export default function AddVictorForm({ demonId, demonName, onClose }: { demonId
               min="80"
               max="100"
               step="0.01"
-              placeholder="np. 100 (zostaw puste jeśli brak)"
+              placeholder="np. 100 (puste = usuń progress)"
             />
-            <small style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>
-              Tylko dla zwycięzców — weryfikatorzy mają zawsze 100%.
-            </small>
           </div>
-          
+
           <div className="modal-actions">
+            <button type="button" className="btn-danger" onClick={handleDelete} disabled={loading} style={{ marginRight: 'auto' }}>
+              Usuń
+            </button>
             <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>Anuluj</button>
-            <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Zapisywanie...' : 'Dodaj Zwycięzcę'}</button>
+            <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Zapisywanie...' : 'Zapisz Zmiany'}</button>
           </div>
         </form>
       </div>

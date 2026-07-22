@@ -7,6 +7,10 @@ export interface Victor {
   link: string;
   date: string;
   isVerifier?: boolean;
+  // Potential = wpis istnieje, ale nie liczy się do stats gracza
+  // (score / main_completed / hardest). Używane dla nie-graczy trzymających WR-y,
+  // kontrowersyjnych zgłoszeń itp. Verified count nadal liczy jeśli też isVerifier.
+  is_potential?: boolean;
   // Progress w % (80-100). Opcjonalny — weryfikatorzy i starsi victorzy mogą go nie mieć.
   progress?: number;
 }
@@ -60,8 +64,11 @@ const SUBMISSIONS_PATH = path.join(process.cwd(), 'data', 'submissions.yml');
 
 export function readDemons(): Demon[] {
   const raw = fs.readFileSync(DEMONS_PATH, 'utf8');
-  const data = yaml.load(raw) as Demon[];
-  return (data || []).sort((a, b) => a.rank - b.rank);
+  const data = (yaml.load(raw) as Demon[] | null) || [];
+  // Defensywnie: stare wpisy mogą nie mieć pola victors (np. po banie ostatniego gracza).
+  return data
+    .map((d) => ({ ...d, victors: d.victors || [] }))
+    .sort((a, b) => a.rank - b.rank);
 }
 
 export function writeDemons(demons: Demon[]): void {
@@ -145,6 +152,83 @@ export function deleteVictor(demonId: number, playerName: string): Demon | null 
   demon.victors = demon.victors.filter((v) => v.player !== playerName);
   writeDemons(demons);
   return demon;
+}
+
+/**
+ * Usuwa WSZYSTKIE wpisy victora (completed + verified) dla danego gracza
+ * ze wszystkich demonów. Case-insensitive match. Zwraca liczbę usuniętych wpisów.
+ * Nie modyfikuje `creator` ani niczego innego — tylko tablicę `victors`.
+ */
+export function banPlayer(playerName: string): number {
+  const target = (playerName || '').toLowerCase();
+  if (!target) return 0;
+  const demons = readDemons();
+  let removed = 0;
+  for (const d of demons) {
+    const before = d.victors.length;
+    d.victors = d.victors.filter((v) => (v.player || '').toLowerCase() !== target);
+    removed += before - d.victors.length;
+  }
+  if (removed > 0) writeDemons(demons);
+  return removed;
+}
+
+/**
+ * Aktualizuje pojedynczego victora w demonie (player jest kluczem).
+ * Wszystkie pola są opcjonalne; puste / null = nie zmieniaj.
+ */
+export function updateVictor(
+  demonId: number,
+  playerName: string,
+  updates: { link?: string; date?: string; isVerifier?: boolean; progress?: number | null; is_potential?: boolean | null }
+): { demon: Demon; victor: Victor } | null {
+  const demons = readDemons();
+  const demon = demons.find((d) => d.id === demonId);
+  if (!demon) return null;
+  const idx = demon.victors.findIndex((v) => v.player === playerName);
+  if (idx === -1) return null;
+  const v = demon.victors[idx];
+  if (updates.link !== undefined) v.link = updates.link;
+  if (updates.date !== undefined) v.date = updates.date;
+  if (updates.isVerifier !== undefined) v.isVerifier = updates.isVerifier;
+  if (updates.is_potential === null) {
+    delete v.is_potential;
+  } else if (updates.is_potential !== undefined) {
+    v.is_potential = updates.is_potential;
+  }
+  if (updates.progress === null) {
+    delete v.progress;
+  } else if (updates.progress !== undefined) {
+    v.progress = updates.progress;
+  }
+  writeDemons(demons);
+  return { demon, victor: v };
+}
+
+/**
+ * Przepisuje `rank` demonów według nowej kolejności id.
+ * `order[0]` = id demona, który dostanie rank=1, itd.
+ * Zachowuje wszystkie inne pola.
+ */
+export function reorderDemons(order: number[]): Demon[] {
+  const demons = readDemons();
+  const byId = new Map(demons.map((d) => [d.id, d]));
+  const seen = new Set<number>();
+  const next: Demon[] = [];
+  order.forEach((id, idx) => {
+    const d = byId.get(id);
+    if (!d) return;
+    seen.add(id);
+    next.push({ ...d, rank: idx + 1 });
+  });
+  // Dorzuć demony spoza `order` na końcu (zachowaj obecne ranki powyżej)
+  for (const d of demons) {
+    if (!seen.has(d.id)) {
+      next.push({ ...d, rank: next.length + 1 });
+    }
+  }
+  writeDemons(next);
+  return next;
 }
 
 export function readSubmissions(): Submission[] {

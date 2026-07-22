@@ -10,6 +10,8 @@ import AddVictorForm from '@/components/admin/AddVictorForm';
 import MergeSubmissionForm from '@/components/admin/MergeSubmissionForm';
 import AddFbChallengeForm from '@/components/admin/AddFbChallengeForm';
 import EditFbChallengeForm from '@/components/admin/EditFbChallengeForm';
+import DemonDragList from '@/components/admin/DemonDragList';
+import StatsTab from './StatsTab';
 import Link from 'next/link';
 
 export default function AdminDashboard() {
@@ -19,7 +21,7 @@ export default function AdminDashboard() {
   const [victorSubmissions, setVictorSubmissions] = useState<VictorSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'demons' | 'submissions' | 'fb-challenges' | 'victor-submissions'>('demons');
+  const [activeTab, setActiveTab] = useState<'demons' | 'submissions' | 'fb-challenges' | 'victor-submissions' | 'stats'>('demons');
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [showAddFbChallengeForm, setShowAddFbChallengeForm] = useState(false);
@@ -227,6 +229,13 @@ export default function AdminDashboard() {
               </span>
             )}
           </button>
+          <button
+            className={`admin-nav-link ${activeTab === 'stats' ? 'active' : ''}`}
+            style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', padding: '0.8rem 1rem', display: 'block' }}
+            onClick={() => setActiveTab('stats')}
+          >
+            Stats
+          </button>
           <Link href="/admin/users" className="admin-nav-link">Użytkownicy (Admin)</Link>
         </nav>
       </div>
@@ -239,64 +248,58 @@ export default function AdminDashboard() {
               <button className="btn-primary" onClick={() => setShowAddForm(true)}>+ Dodaj Demona</button>
             </div>
 
-            <div className="card admin-table-wrap">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: '60px' }}>Rank</th>
-                    <th>Nazwa</th>
-                    <th>Twórca</th>
-                    <th>Victorzy / Weryfikator</th>
-                    <th style={{ textAlign: 'right' }}>Akcje</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {demons.map(demon => {
-                    const verifier = demon.victors?.find(v => v.isVerifier);
-                    const actualVictors = demon.victors?.filter(v => !v.isVerifier) || [];
-                    return (
-                      <tr key={demon.id}>
-                        <td><strong style={{ color: 'var(--accent)' }}>#{demon.rank}</strong></td>
-                        <td>
-                          <strong>{demon.name}</strong>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>ID: {demon.level_id || 'Brak'}</div>
-                        </td>
-                        <td>{demon.creator}</td>
-                        <td>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <span style={{ fontSize: '0.9rem' }}>{actualVictors.length} zwycięzców</span>
-                              <button className="btn-secondary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }} onClick={() => setAddVictorTo({ id: demon.id, name: demon.name })}>
-                                + Victor / Weryfikator
-                              </button>
-                            </div>
-                            {verifier && (
-                              <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-                                Weryfikator: <strong style={{ color: 'var(--accent)' }}>{verifier.player}</strong>
-                                <button
-                                  onClick={() => handleVictorDelete(demon.id, verifier.player)}
-                                  style={{ background: 'none', border: 'none', color: '#ff4b4b', cursor: 'pointer', marginLeft: '0.4rem', fontSize: '0.7rem' }}
-                                >
-                                  [usuń]
-                                </button>
-                              </div>
-                            )}
+            <div className="card" style={{ padding: '1rem' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.8rem' }}>
+                💡 Przeciągnij kropki ⠿ obok demona, aby zmienić jego pozycję w rankingu.
+              </p>
+              <DemonDragList
+                initialDemons={demons}
+                renderLeft={(demon) => {
+                  const verifier = demon.victors?.find(v => v.isVerifier);
+                  const actualVictors = demon.victors?.filter(v => !v.isVerifier) || [];
+                  return (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0 }}>
+                      <div style={{
+                        fontFamily: 'Rajdhani, sans-serif',
+                        fontWeight: 700,
+                        fontSize: '1.2rem',
+                        color: 'var(--accent)',
+                        minWidth: '3rem',
+                        textAlign: 'right',
+                      }}>
+                        #{demon.rank}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: '1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {demon.name}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          {demon.creator} · ID: {demon.level_id || 'Brak'} · {actualVictors.length} zwycięzców
+                        </div>
+                        {verifier && (
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', marginTop: '0.2rem' }}>
+                            Weryfikator: <strong style={{ color: 'var(--accent)' }}>{verifier.player}</strong>
                           </div>
-                        </td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                            <button className="btn-secondary" onClick={() => setEditDemon(demon)}>Edytuj</button>
-                            <button className="btn-danger" onClick={() => handleDelete(demon.id, demon.name)}>Usuń</button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {demons.length === 0 && (
-                    <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Brak demonów</td></tr>
-                  )}
-                </tbody>
-              </table>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button className="btn-secondary" style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }} onClick={() => setAddVictorTo({ id: demon.id, name: demon.name })}>
+                          + Victor
+                        </button>
+                        <button className="btn-secondary" style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }} onClick={() => setEditDemon(demon)}>
+                          Edytuj
+                        </button>
+                        <button className="btn-danger" style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }} onClick={() => handleDelete(demon.id, demon.name)}>
+                          Usuń
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+              {demons.length === 0 && (
+                <div className="stats-empty">Brak demonów</div>
+              )}
             </div>
           </>
         )}
@@ -506,6 +509,10 @@ export default function AdminDashboard() {
               </table>
             </div>
           </>
+        )}
+
+        {activeTab === 'stats' && (
+          <StatsTab />
         )}
       </div>
 

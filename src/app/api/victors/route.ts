@@ -3,7 +3,7 @@ import { addVictor } from '@/lib/yaml';
 
 export async function POST(request: Request) {
   try {
-    const { demon_id, player, link, date, isVerifier, progress } = await request.json();
+    const { demon_id, player, link, date, isVerifier, progress, is_potential } = await request.json();
 
     if (!demon_id || !player || (!link && !isVerifier)) {
       return NextResponse.json({ error: 'Brakuje pól: demon_id, player, link' }, { status: 400 });
@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       link: link || '',
       date: date || new Date().toISOString().split('T')[0],
       isVerifier: !!isVerifier,
+      is_potential: !!is_potential,
       progress: progressNum,
     });
 

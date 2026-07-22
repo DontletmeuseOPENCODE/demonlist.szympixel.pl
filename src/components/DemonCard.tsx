@@ -5,8 +5,8 @@ import { getYouTubeThumbnail } from '@/lib/youtube';
 export default function DemonCard({ demon }: { demon: Demon }) {
   const getRankClass = (rank: number) => {
     if (rank === 1) return 'top1';
-    if (rank <= 3) return 'top3';
-    if (rank <= 10) return 'top10';
+    if (rank === 2) return 'top2';
+    if (rank === 3) return 'top3';
     return '';
   };
 
@@ -30,7 +30,7 @@ export default function DemonCard({ demon }: { demon: Demon }) {
       </div>
 
       <div className="demon-victors-count">
-        {demon.victors.length} {demon.victors.length === 1 ? 'victor' : 'victors'}
+        {(demon.victors?.length ?? 0)} {(demon.victors?.length ?? 0) === 1 ? 'victor' : 'victors'}
       </div>
     </Link>
   );

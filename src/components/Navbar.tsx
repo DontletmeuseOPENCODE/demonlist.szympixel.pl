@@ -26,6 +26,7 @@ export default function Navbar({ user }: NavbarProps) {
   const links = [
     { href: '/', label: 'Demonlist' },
     { href: '/challenges', label: 'FB Challenges' },
+    { href: '/stats', label: 'Stats' },
   ];
 
   return (
