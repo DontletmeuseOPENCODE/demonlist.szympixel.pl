@@ -1,4 +1,4 @@
-import { getDemonById } from '@/lib/yaml';
+import { getDemonById, readDemons } from '@/lib/yaml';
 import { getNewgroundsSongUrl } from '@/lib/youtube';
 import { notFound } from 'next/navigation';
 import VictorList from '@/components/VictorList';
@@ -20,6 +20,11 @@ export default async function DemonPage({ params }: Params) {
   const session = await getSession();
   const isAdmin = !!(session?.isLoggedIn && session.role === 'admin');
 
+  const allDemons = readDemons();
+  const currentIndex = allDemons.findIndex(d => d.id === demon.id);
+  const prevDemon = currentIndex > 0 ? allDemons[currentIndex - 1] : null;
+  const nextDemon = currentIndex < allDemons.length - 1 ? allDemons[currentIndex + 1] : null;
+
   // Używamy miniatury YT w wyższej jakości, jeśli video to link z youtube
   let hdThumbnail = demon.thumbnail;
   if (hdThumbnail.includes('hqdefault.jpg')) {
@@ -31,9 +36,28 @@ export default async function DemonPage({ params }: Params) {
 
   return (
     <div className="demon-detail">
-      <Link href="/" style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', display: 'inline-block', fontSize: '0.9rem' }}>
-        ← Powrót do listy
-      </Link>
+      <div className="demon-nav">
+        <Link href="/" className="demon-nav-back">
+          ← Lista
+        </Link>
+        <div className="demon-nav-arrows">
+          {prevDemon ? (
+            <Link href={`/demon/${prevDemon.id}`} className="demon-nav-arrow" title={`#${prevDemon.rank} ${prevDemon.name}`}>
+              ← #{prevDemon.rank}
+            </Link>
+          ) : (
+            <span className="demon-nav-arrow disabled">—</span>
+          )}
+          <span className="demon-nav-current">#{demon.rank} / {allDemons.length}</span>
+          {nextDemon ? (
+            <Link href={`/demon/${nextDemon.id}`} className="demon-nav-arrow" title={`#${nextDemon.rank} ${nextDemon.name}`}>
+              #{nextDemon.rank} →
+            </Link>
+          ) : (
+            <span className="demon-nav-arrow disabled">—</span>
+          )}
+        </div>
+      </div>
       
       <div className="demon-detail-hero">
         {demon.video ? (

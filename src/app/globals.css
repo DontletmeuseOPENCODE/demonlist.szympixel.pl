@@ -385,6 +385,58 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 /* ─── Demon Detail Page ─── */
 .demon-detail { max-width: 900px; }
 
+.demon-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.demon-nav-back {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.demon-nav-back:hover { color: var(--text-primary); }
+
+.demon-nav-arrows {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.demon-nav-arrow {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  transition: all 0.15s ease;
+}
+.demon-nav-arrow:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.demon-nav-arrow.disabled {
+  color: var(--text-dim);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.demon-nav-current {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.05em;
+}
+
 .demon-detail-hero {
   position: relative;
   border-radius: var(--radius-lg);
