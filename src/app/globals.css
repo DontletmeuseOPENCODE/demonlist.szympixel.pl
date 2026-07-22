@@ -341,8 +341,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   line-height: 1;
 }
 .demon-rank.top1 { color: var(--gold); }
-.demon-rank.top3 { color: #c0c0c0; }
-.demon-rank.top10 { color: #cd7f32; }
+.demon-rank.top2 { color: #c0c0c0; }
+.demon-rank.top3 { color: #cd7f32; }
 
 .demon-thumbnail {
   width: 72px;
@@ -641,8 +641,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   line-height: 1;
 }
 .stats-demon-rank.top1 { color: var(--gold); }
-.stats-demon-rank.top3 { color: #c0c0c0; }
-.stats-demon-rank.top10 { color: #cd7f32; }
+.stats-demon-rank.top2 { color: #c0c0c0; }
+.stats-demon-rank.top3 { color: #cd7f32; }
 
 .stats-demon-thumb {
   width: 64px;

@@ -9,8 +9,8 @@ interface Props {
 
 function rankClass(rank: number): string {
   if (rank === 1) return 'stats-demon-rank top1';
-  if (rank <= 3) return 'stats-demon-rank top3';
-  if (rank <= 10) return 'stats-demon-rank top10';
+  if (rank === 2) return 'stats-demon-rank top2';
+  if (rank === 3) return 'stats-demon-rank top3';
   return 'stats-demon-rank';
 }
 
